@@ -22,6 +22,14 @@ Item {
   readonly property bool autoStartGateway: cfg.autoStartGateway ?? defaults.autoStartGateway ?? true
   readonly property int statusPollIntervalSec: cfg.statusPollIntervalSec ?? defaults.statusPollIntervalSec ?? 30
   readonly property bool clientOnlyMode: cfg.clientOnlyMode ?? defaults.clientOnlyMode ?? false
+
+  // Switching to client-only at runtime: tear down any locally-spawned bridge so
+  // it stops holding the port (the remote bridge is reached via the SSH tunnel).
+  onClientOnlyModeChanged: {
+    if (clientOnlyMode && bridgeProcess.running) {
+      bridgeProcess.running = false;
+    }
+  }
   readonly property string expandedStateFile: expandHome(stateFile)
   readonly property string expandedHermesHome: expandHome(hermesHome)
   readonly property string bridgeScript: (pluginApi?.pluginDir || ".") + "/scripts/hermes_bridge.py"
