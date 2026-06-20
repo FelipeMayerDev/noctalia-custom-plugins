@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "plugins": [
+    {
+      "id": "hermes-ssh-chat",
+      "name": "Hermes SSH Terminal",
+      "version": "1.0.0",
+      "official": false,
+      "author": "focky",
+      "description": "Use Hermes on a remote server through an interactive SSH terminal.",
+      "repository": "https://github.com/FelipeMayerDev/noctalia-custom-plugins",
+      "minNoctaliaVersion": "4.6.6",
+      "license": "MIT",
+      "tags": [
+        "Bar",
+        "Panel",
+        "Development",
+        "AI"
+      ],
+      "lastUpdated": "2026-06-20T15:22:34-03:00"
+    }
+  ]
+}
