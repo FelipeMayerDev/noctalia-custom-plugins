@@ -6,7 +6,7 @@
       "name": "Hermes SSH Terminal",
       "version": "1.0.0",
       "official": false,
-      "author": "focky",
+      "author": "FelipeMayerDev",
       "description": "Use Hermes on a remote server through an interactive SSH terminal.",
       "repository": "https://github.com/FelipeMayerDev/noctalia-custom-plugins",
       "minNoctaliaVersion": "4.6.6",
