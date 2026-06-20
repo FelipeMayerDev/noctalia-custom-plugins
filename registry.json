@@ -20,6 +20,24 @@
       "lastUpdated": "2026-06-20T15:22:34-03:00"
     },
     {
+      "id": "hermes-agent",
+      "name": "Hermes Agent",
+      "version": "1.0.0",
+      "official": false,
+      "author": "nomadx",
+      "description": "Native Noctalia status, chat panel, and launcher provider for Hermes Agent. Bar widget with traffic-light status + summary popup, streaming chat with tool-call approvals, session management, and a >hermes launcher command. Local authenticated HTTP bridge to Hermes.",
+      "repository": "https://github.com/FelipeMayerDev/noctalia-custom-plugins",
+      "minNoctaliaVersion": "4.4.1",
+      "license": "MIT",
+      "tags": [
+        "Bar",
+        "Panel",
+        "Launcher",
+        "AI"
+      ],
+      "lastUpdated": "2026-06-20T16:05:00-03:00"
+    },
+    {
       "id": "ai-usage-panel",
       "name": "AI Usage Panel",
       "version": "0.1.0",
