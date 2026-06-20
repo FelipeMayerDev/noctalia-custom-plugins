@@ -56,6 +56,39 @@ In this mode the plugin never spawns a local bridge; it polls `/state` over HTTP
 selection, sessions, approvals, and the `>hermes` launcher all operate against
 the remote bridge.
 
+### Troubleshooting
+
+**`bind [127.0.0.1]:19777: Address already in use` when opening the tunnel.**
+Something already holds the port on the client — usually a local bridge spawned
+by the plugin *before* client-only mode was enabled, or a previous tunnel still
+open. Find and stop it, then re-open the tunnel:
+
+```bash
+ss -ltnp | grep 19777                 # see what holds the port
+pkill -f hermes_bridge.py             # kill a stray local bridge (safe in client-only mode)
+```
+
+Enabling client-only mode now tears down any local bridge automatically, so this
+only bites when upgrading from an older setup. Tip: if the port is taken, the
+tunnel may bind only IPv6 (`::1`) and the plugin (which calls `127.0.0.1`, IPv4)
+won't reach it — always free the port first.
+
+**Bar pill is grey / "unknown" even though the tunnel works.** The bridge reports
+`hermes.status: "unknown"` until a session runs or a status hook fires. The pill
+falls back to the gateway: if the gateway is **running** it shows **idle**; if it
+stays unknown, the Hermes gateway is not running on the server (start it, or let
+`autoStartGateway` do it).
+
+**Verify the tunnel independently** of the plugin:
+
+```bash
+curl -s 127.0.0.1:19777/health                              # -> {"bridge": {"status": "online"}}
+curl -s -H "X-Bridge-Token: <token>" 127.0.0.1:19777/state  # -> full state JSON
+```
+
+If `/health` works but the plugin still looks disconnected, reload Noctalia so it
+re-polls with the tunnel up.
+
 ## Settings
 
 | Setting | Default | Description |
