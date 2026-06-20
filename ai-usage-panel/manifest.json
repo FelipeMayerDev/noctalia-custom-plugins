@@ -1,0 +1,31 @@
+{
+  "id": "ai-usage-panel",
+  "name": "AI Usage Panel",
+  "version": "0.1.0",
+  "author": "FelipeMayerDev",
+  "license": "MIT",
+  "repository": "https://github.com/FelipeMayerDev/noctalia-custom-plugins",
+  "description": "Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the Noctalia bar. Noctalia port of gustavobragac's plasma-ai-usage-panel.",
+  "tags": [
+    "Bar",
+    "Panel",
+    "AI"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "panel": "Panel.qml",
+    "settings": "Settings.qml"
+  },
+  "metadata": {
+    "cpuIntensive": false,
+    "defaultSettings": {
+      "enabledProviders": ["claude", "codex"],
+      "refreshIntervalSeconds": 120,
+      "iconOnlyMode": false,
+      "showResetTime": true,
+      "refreshOnOpen": true,
+      "iconColor": "none",
+      "textColor": "none"
+    }
+  }
+}

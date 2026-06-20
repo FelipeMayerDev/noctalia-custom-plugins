@@ -18,6 +18,22 @@
         "AI"
       ],
       "lastUpdated": "2026-06-20T15:22:34-03:00"
+    },
+    {
+      "id": "ai-usage-panel",
+      "name": "AI Usage Panel",
+      "version": "0.1.0",
+      "official": false,
+      "author": "FelipeMayerDev",
+      "description": "Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the Noctalia bar. Noctalia port of gustavobragac's plasma-ai-usage-panel.",
+      "repository": "https://github.com/FelipeMayerDev/noctalia-custom-plugins",
+      "license": "MIT",
+      "tags": [
+        "Bar",
+        "Panel",
+        "AI"
+      ],
+      "lastUpdated": "2026-06-20T15:48:00-03:00"
     }
   ]
 }

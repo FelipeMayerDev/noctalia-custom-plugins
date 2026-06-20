@@ -7,6 +7,7 @@ Custom plugins for [Noctalia Shell](https://github.com/noctalia-dev).
 | Plugin | Description |
 |---|---|
 | [hermes-ssh-chat](hermes-ssh-chat/) | Use Hermes on a remote server through an interactive SSH terminal. |
+| [ai-usage-panel](ai-usage-panel/) | Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the bar. Port of gustavobragac's plasma-ai-usage-panel. |
 
 ## Installation
 
