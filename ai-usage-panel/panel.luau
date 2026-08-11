@@ -134,7 +134,7 @@ local function appendCodexResetControls(content, data)
     end
   end
   if nextExpiry ~= nil then
-    local expiresText = noctalia.formatTime("%d/%m · %H:%M UTC", math.floor(nextExpiry), "UTC")
+    local expiresText = formatRemaining(nextExpiry)
     table.insert(content, ui.label({
       text = string.format(tr("panel.reset_expires"), expiresText),
       fontSize = 10,

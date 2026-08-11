@@ -15,7 +15,7 @@
     "remaining_hours_minutes": "%dh %dm",
     "remaining_minutes": "%dm",
     "codex_resets": "%d reset credits available · %d usable now",
-    "reset_expires": "Next reset expires %s",
+    "reset_expires": "Next reset expiry · %s",
     "reset_now": "Reset now",
     "resetting": "Resetting…",
     "reset_confirmation": "Consume one saved reset and reset Codex rate limits now? This cannot be undone.",

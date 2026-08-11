@@ -28,7 +28,7 @@ noctalia msg panel-toggle felipemayerdev/ai-usage-panel:usage-panel
 The service refreshes all enabled providers concurrently. A refresh already in progress is reused rather than duplicated. If a transient request fails after a successful refresh, the UI keeps the last result and marks it stale.
 Equivalent rolling windows use the same duration labels across providers—for example, `5 hours` and `7 days`—instead of provider-specific names such as “primary” and “secondary”. Each reset is shown as remaining days and hours, or hours and minutes when less than one day remains.
 
-Provider cards use compact single-line quota rows. Plan/account metadata stays in the card header, while implementation-source details remain hidden. The Codex card also shows saved rate-limit reset credits, how many are currently usable, and the next credit expiration in UTC. `Reset now` remains disabled unless the API marks a credit applicable, then requires a separate destructive confirmation before consuming it.
+Provider cards use compact single-line quota rows. Plan/account metadata stays in the card header, while implementation-source details remain hidden. The Codex card also shows saved rate-limit reset credits, how many are currently usable, and the remaining days and hours until the next credit expires. `Reset now` remains disabled unless the API marks a credit applicable, then requires a separate destructive confirmation before consuming it.
 
 ## Providers
 
