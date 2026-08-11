@@ -1,11 +1,11 @@
 id = "felipemayerdev/ai-usage-panel"
 name = "AI Usage Panel"
-version = "1.0.0"
+version = "1.1.0"
 plugin_api = 3
 author = "FelipeMayerDev"
 license = "MIT"
-description = "Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the Noctalia bar."
-dependencies = ["claude-usage", "codex-usage", "copilot-usage", "zen-balance", "zai-usage"]
+description = "Native Claude, Codex, Copilot, Z.ai, and OpenCode Zen quota monitoring for Noctalia."
+dependencies = ["gh", "zen-balance"]
 tags = ["ai", "bar", "panel", "system"]
 icon = "chart-bar"
 
@@ -47,6 +47,16 @@ description_key = "settings.refresh_on_open.description"
 default = true
 
 [[setting]]
+key = "copilot_monthly_quota"
+type = "int"
+label_key = "settings.copilot_monthly_quota.label"
+description_key = "settings.copilot_monthly_quota.description"
+default = 300
+min = 1
+max = 100000
+advanced = true
+
+[[setting]]
 key = "zai_token"
 type = "string"
 label_key = "settings.zai_token.label"
@@ -61,8 +71,8 @@ entry = "widget.luau"
 [[panel]]
 id = "usage-panel"
 entry = "panel.luau"
-width = 460
-height = 620
+width = 520
+height = 680
 placement = "floating"
 position = "center"
 

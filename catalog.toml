@@ -4,13 +4,13 @@
 [[plugin]]
 id = "felipemayerdev/ai-usage-panel"
 name = "AI Usage Panel"
-version = "1.0.0"
-updated_at = 1786415333
+version = "1.1.0"
+updated_at = 1786416648
 added_at = 1786415333
 author = "FelipeMayerDev"
 license = "MIT"
 icon = "chart-bar"
-description = "Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the Noctalia bar."
+description = "Native Claude, Codex, Copilot, Z.ai, and OpenCode Zen quota monitoring for Noctalia."
 plugin_api = 3
 tags = ["ai", "bar", "panel", "system"]
 

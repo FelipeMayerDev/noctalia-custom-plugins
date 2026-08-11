@@ -6,7 +6,7 @@ Custom plugins for [Noctalia Shell 5](https://github.com/noctalia-dev/noctalia).
 
 | Plugin | Description |
 |---|---|
-| [ai-usage-panel](ai-usage-panel/) | Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the bar. Port of gustavobragac's plasma-ai-usage-panel. |
+| [ai-usage-panel](ai-usage-panel/) | Native Claude, Codex, Copilot, OpenCode Zen, and Z.ai quota monitoring. Noctalia port of gustavobragac's plasma-ai-usage-panel. |
 | [hermes-agent](hermes-agent/) | Native Noctalia status, chat panel, and launcher for Hermes Agent. Supports client-only mode through a remote bridge over SSH. Fork of [nomadx's plugin](https://github.com/noctalia-dev/legacy-v4-plugins/pull/934). |
 | [hermes-ssh-chat](hermes-ssh-chat/) | Launch Hermes on a remote server in an interactive SSH terminal. |
 

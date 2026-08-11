@@ -1,8 +1,8 @@
 # AI Usage Panel
 
-Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the Noctalia 5 bar.
+Native quota monitoring for Claude, Codex, Copilot, OpenCode Zen, and Z.ai in the Noctalia 5 bar.
 
-This is a Noctalia port of [gustavobragac/plasma-ai-usage-panel](https://github.com/gustavobragac/plasma-ai-usage-panel), originally a KDE Plasma 6 widget.
+This plugin is a Noctalia port of [gustavobragac/plasma-ai-usage-panel](https://github.com/gustavobragac/plasma-ai-usage-panel), originally a KDE Plasma 6 widget. Version 1.1 replaces the mandatory Python helper backend with Noctalia's native HTTP and credential APIs for Claude, Codex, and Z.ai.
 
 | Plugin | Value |
 |---|---|
@@ -10,50 +10,60 @@ This is a Noctalia port of [gustavobragac/plasma-ai-usage-panel](https://github.
 | Bar widget | `usage` |
 | Panel | `usage-panel` |
 | Service | `usage-service` |
+| Minimum plugin API | 3 |
 
 ## Usage
 
-1. Enable `felipemayerdev/ai-usage-panel`.
-2. Add **AI Usage Panel → usage** to the bar.
-3. Click the widget to open the provider panel. Right-click it to open plugin settings.
-4. The panel can also be opened directly:
+1. Sign in to the CLI for each provider you want to monitor.
+2. Enable `felipemayerdev/ai-usage-panel`.
+3. Add **AI Usage Panel → usage** in the bar editor.
+4. Click the widget to open the quota panel. Right-click to refresh.
 
-   ```bash
-   noctalia msg panel-toggle felipemayerdev/ai-usage-panel:usage-panel
-   ```
+Open the panel directly with:
 
-The background service refreshes enabled providers on the configured interval. The panel refresh button and refresh-on-open setting request an immediate update without starting a second overlapping refresh.
+```bash
+noctalia msg panel-toggle felipemayerdev/ai-usage-panel:usage-panel
+```
 
-## Requirements
+The service refreshes all enabled providers concurrently. A refresh already in progress is reused rather than duplicated. If a transient request fails after a successful refresh, the UI keeps the last result and marks it stale.
 
-Install the helpers for every provider you enable and make them available on `PATH`:
+## Providers
 
-- `claude-usage`
-- `codex-usage`
-- `copilot-usage`
-- `zen-balance`
-- `zai-usage`
+| Provider ID | Authentication and data source | Extra command |
+|---|---|---|
+| `claude` | Reads the active Claude Code OAuth session from `~/.claude/.credentials.json`; requests `api.anthropic.com/api/oauth/usage`. | None |
+| `codex` | Reads the active Codex CLI OAuth session from `~/.codex/auth.json`; requests the Codex usage API. | None |
+| `copilot` | Reads the active GitHub CLI token and requests GitHub's premium-request billing API. | `gh` |
+| `zen` | Uses the upstream browser-cookie collector. | `zen-balance` |
+| `zai` | Uses the API key stored in Noctalia plugin settings and requests `api.z.ai` directly. | None |
 
-Provider browser-cookie selection remains managed by the upstream `ai-cookie-source` helper. The optional Z.ai API key setting is written to `~/.config/plasma-ai-usage-panel/zai.conf` with mode `0600` for `zai-usage` compatibility.
+Claude and Codex are enabled by default and no longer require `claude-usage`, `codex-usage`, Python, `uv`, or `curl_cffi`. Open the corresponding CLI once if an OAuth token is missing or expired. Copilot requires a GitHub token allowed to read the account's premium-request usage; GitHub may return 404 when the account or token does not expose that endpoint.
+
+Install the optional OpenCode Zen collector from the upstream project:
+
+```bash
+uv tool install --from plasma-ai-usage-panel zen-balance
+```
 
 ## Settings
 
 | Setting | Default | Description |
 |---|---:|---|
-| Enabled providers | `claude`, `codex` | Provider IDs queried by the service. |
+| Enabled providers | `claude`, `codex` | Provider IDs queried by the service: `claude`, `codex`, `copilot`, `zen`, `zai`. |
 | Refresh interval | 120 seconds | Automatic refresh cadence, from 30 to 3600 seconds. |
-| Icon only | Off | Hide compact usage labels in the bar. |
-| Show reset time | On | Keep reset timing from helper output in bar labels. |
-| Refresh on open | On | Refresh when data is at least 10 seconds old. |
-| Z.ai API key | Empty | Credential consumed by `zai-usage`. |
+| Compact bar labels | Off | Show provider abbreviations instead of names and quota values. |
+| Show reset times | On | Show each quota window's reset timestamp in the panel. |
+| Refresh when opening | On | Request fresh usage whenever the panel opens. |
+| Copilot monthly quota | 300 | Allowance used to calculate Copilot's displayed percentage. |
+| Z.ai API key | Empty | API key from `z.ai/manage-apikey/apikey-list`. |
 
-## Network, files, and processes
+## Network, files, and credentials
 
-The plugin executes the declared local usage helpers. Those helpers perform provider-specific browser-cookie or API requests. The plugin itself writes only the optional Z.ai compatibility file.
+The service reads Claude and Codex OAuth files on each refresh so CLI token rotation is picked up automatically. It passes credentials only in HTTPS authorization headers and never copies them into plugin state, logs, or compatibility files. The Z.ai key remains in Noctalia's plugin settings. The optional `gh` and `zen-balance` processes run only when their providers are enabled.
 
 ## Credits
 
-Original KDE Plasma widget and CLI helpers by gustavobragac (NihilDigit). Noctalia port by FelipeMayerDev.
+Original KDE Plasma widget and collector work by gustavobragac (NihilDigit). Noctalia port by FelipeMayerDev.
 
 ## License
 

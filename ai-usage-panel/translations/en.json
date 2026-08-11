@@ -1,35 +1,45 @@
 {
   "panel": {
-    "close": "Close",
-    "no_providers": "Enable at least one provider in plugin settings.",
+    "title": "AI Usage",
     "refresh": "Refresh",
-    "refreshing": "Refreshing",
-    "title": "AI Usage"
+    "refreshing": "Refreshing…",
+    "updated": "Updated",
+    "waiting": "Waiting for the first response…",
+    "unavailable": "Usage unavailable",
+    "stale": "Showing last successful data",
+    "source": "Source",
+    "quota": "Quota",
+    "resets": "Resets",
+    "no_providers": "Enable at least one provider in plugin settings."
   },
   "settings": {
     "enabled_providers": {
-      "description": "Provider IDs to query: claude, codex, copilot, zen, and zai.",
-      "label": "Enabled providers"
-    },
-    "icon_only": {
-      "description": "Show only the chart glyph in the bar.",
-      "label": "Icon only"
+      "label": "Enabled providers",
+      "description": "Provider IDs: claude, codex, copilot, zen, zai. Claude and Codex use their CLI OAuth sessions directly."
     },
     "refresh_interval": {
-      "description": "Seconds between automatic usage refreshes.",
-      "label": "Refresh interval"
+      "label": "Refresh interval",
+      "description": "Seconds between usage refreshes."
     },
-    "refresh_on_open": {
-      "description": "Refresh data when the panel opens, limited to once every 10 seconds.",
-      "label": "Refresh on open"
+    "icon_only": {
+      "label": "Compact bar labels",
+      "description": "Show provider abbreviations instead of names and quota values."
     },
     "show_reset_time": {
-      "description": "Keep reset timing in compact bar labels when the helper provides it.",
-      "label": "Show reset time"
+      "label": "Show reset times",
+      "description": "Show provider quota reset timestamps in the panel."
+    },
+    "refresh_on_open": {
+      "label": "Refresh when opening",
+      "description": "Request fresh usage whenever the panel opens."
+    },
+    "copilot_monthly_quota": {
+      "label": "Copilot monthly quota",
+      "description": "Premium request allowance used to calculate the Copilot percentage."
     },
     "zai_token": {
-      "description": "Saved to ~/.config/plasma-ai-usage-panel/zai.conf for zai-usage compatibility.",
-      "label": "Z.ai API key"
+      "label": "Z.ai API key",
+      "description": "API key from z.ai/manage-apikey/apikey-list. Stored only in Noctalia plugin settings."
     }
   }
 }
