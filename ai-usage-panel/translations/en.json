@@ -10,6 +10,16 @@
     "source": "Source",
     "quota": "Quota",
     "resets": "Resets",
+    "now": "now",
+    "remaining_days_hours": "%dd %dh",
+    "remaining_hours_minutes": "%dh %dm",
+    "remaining_minutes": "%dm",
+    "codex_resets": "%d reset credits available · %d usable now",
+    "reset_now": "Reset now",
+    "resetting": "Resetting…",
+    "reset_confirmation": "Consume one saved reset and reset Codex rate limits now? This cannot be undone.",
+    "cancel": "Cancel",
+    "confirm_reset": "Confirm reset",
     "no_providers": "Enable at least one provider in plugin settings."
   },
   "period": {
@@ -41,8 +51,8 @@
       "description": "Font size for provider names, values, and compact usage percentages."
     },
     "show_reset_time": {
-      "label": "Show reset times",
-      "description": "Show provider quota reset timestamps in the panel."
+      "label": "Show reset countdowns",
+      "description": "Show the remaining time until each provider quota window resets."
     },
     "copilot_monthly_quota": {
       "label": "Copilot monthly quota",

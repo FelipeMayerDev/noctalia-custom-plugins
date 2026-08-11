@@ -11,6 +11,9 @@ local PROVIDERS = {
 local providerData = noctalia.state.get("usage_providers") or {}
 local refreshing = noctalia.state.get("usage_refreshing") == true
 local lastRefresh = tonumber(noctalia.state.get("usage_last_refresh"))
+local codexResetInFlight = noctalia.state.get("codex_reset_in_flight") == true
+local codexResetError = tostring(noctalia.state.get("codex_reset_error") or "")
+local confirmingCodexReset = false
 
 local function tr(key)
   return noctalia.tr(key)
@@ -35,20 +38,26 @@ local function refresh()
   noctalia.state.set("usage_refresh_request", nonce)
 end
 
-local function formatReset(value)
-  if value == nil or value == "" then
+local function formatRemaining(value)
+  local resetAt = tonumber(value)
+  if resetAt == nil then
     return ""
   end
-  if type(value) == "number" then
-    return noctalia.formatTime("%d/%m · %H:%M UTC", math.floor(value), "UTC")
+  local totalMinutes = math.max(0, math.ceil((resetAt - os.time()) / 60))
+  if totalMinutes <= 0 then
+    return tr("panel.now")
   end
-  local raw = tostring(value)
-  local _, month, day, hour, minute = raw:match("^(%d%d%d%d)%-(%d%d)%-(%d%d)T(%d%d):(%d%d)")
-  if month ~= nil then
-    local zone = (raw:match("Z$") ~= nil or raw:match("%+00:00$") ~= nil) and "UTC" or tostring(raw:match("([+-]%d%d:%d%d)$") or "")
-    return string.format("%s/%s · %s:%s%s", day, month, hour, minute, zone ~= "" and " " .. zone or "")
+  if totalMinutes >= 24 * 60 then
+    local days = math.floor(totalMinutes / (24 * 60))
+    local hours = math.floor((totalMinutes % (24 * 60)) / 60)
+    return string.format(tr("panel.remaining_days_hours"), days, hours)
   end
-  return raw
+  local hours = math.floor(totalMinutes / 60)
+  local minutes = totalMinutes % 60
+  if hours > 0 then
+    return string.format(tr("panel.remaining_hours_minutes"), hours, minutes)
+  end
+  return string.format(tr("panel.remaining_minutes"), minutes)
 end
 
 local function periodLabel(item)
@@ -81,7 +90,7 @@ local function quotaWindowNode(item, index)
     ui.progress({ progress = percentage / 100, width = 108, height = 5, radius = 3 }),
     ui.label({ text = string.format("%.0f%%", percentage), fontSize = 11, fontWeight = "bold", maxWidth = 36 }),
   }
-  local reset = formatReset(item.resets_at)
+  local reset = formatRemaining(item.resets_at)
   if noctalia.getConfig("show_reset_time") ~= false and reset ~= "" then
     table.insert(children, ui.spacer({ flexGrow = 1 }))
     table.insert(children, ui.label({
@@ -93,6 +102,54 @@ local function quotaWindowNode(item, index)
   end
   return ui.row({ key = `window={index}`, gap = 6, align = "center" }, children)
 end
+local function appendCodexResetControls(content, data)
+  local resetCredits = type(data) == "table" and data.reset_credits or nil
+  if type(resetCredits) ~= "table" then
+    return
+  end
+  local available = math.max(0, tonumber(resetCredits.available_count) or 0)
+  local applicable = math.max(0, tonumber(resetCredits.applicable_available_count) or 0)
+  table.insert(content, ui.row({ gap = 6, align = "center" }, {
+    ui.label({
+      text = string.format(tr("panel.codex_resets"), available, applicable),
+      fontSize = 10,
+      color = "on_surface_variant",
+    }),
+    ui.spacer({ flexGrow = 1 }),
+    ui.button({
+      text = codexResetInFlight and tr("panel.resetting") or tr("panel.reset_now"),
+      variant = "outline",
+      controlSize = "sm",
+      enabled = applicable > 0 and data.stale ~= true and not codexResetInFlight,
+      onClick = "onRequestCodexReset",
+    }),
+  }))
+  if confirmingCodexReset then
+    table.insert(content, ui.column({
+      gap = 5,
+      padding = 7,
+      radius = 6,
+      border = "error",
+      borderWidth = 1,
+    }, {
+      ui.label({
+        text = tr("panel.reset_confirmation"),
+        fontSize = 10,
+        color = "error",
+        maxLines = 2,
+      }),
+      ui.row({ gap = 6, align = "center" }, {
+        ui.spacer({ flexGrow = 1 }),
+        ui.button({ text = tr("panel.cancel"), variant = "ghost", controlSize = "sm", onClick = "onCancelCodexReset" }),
+        ui.button({ text = tr("panel.confirm_reset"), variant = "destructive", controlSize = "sm", onClick = "onConfirmCodexReset" }),
+      }),
+    }))
+  end
+  if codexResetError ~= "" then
+    table.insert(content, ui.label({ text = codexResetError, fontSize = 10, color = "error", maxLines = 2 }))
+  end
+end
+
 
 local function providerCard(provider, data)
   local headerValue = "…"
@@ -124,6 +181,9 @@ local function providerCard(provider, data)
   else
     for index, item in ipairs(data.windows or {}) do
       table.insert(content, quotaWindowNode(item, index))
+    end
+    if provider.id == "codex" then
+      appendCodexResetControls(content, data)
     end
     if data.stale == true then
       table.insert(content, ui.label({
@@ -194,7 +254,40 @@ function onRefresh()
 end
 
 function onClose()
+  confirmingCodexReset = false
   panel.close()
+end
+
+function onRequestCodexReset()
+  local codexData = providerData.codex
+  local resetCredits = type(codexData) == "table" and codexData.reset_credits or nil
+  if type(resetCredits) ~= "table" or codexData.stale == true or (tonumber(resetCredits.applicable_available_count) or 0) <= 0 then
+    return
+  end
+  confirmingCodexReset = true
+  render()
+end
+
+function onCancelCodexReset()
+  confirmingCodexReset = false
+  render()
+end
+
+function onConfirmCodexReset()
+  if not confirmingCodexReset then
+    return
+  end
+  local codexData = providerData.codex
+  local resetCredits = type(codexData) == "table" and codexData.reset_credits or nil
+  if type(resetCredits) ~= "table" or codexData.stale == true or (tonumber(resetCredits.applicable_available_count) or 0) <= 0 then
+    confirmingCodexReset = false
+    render()
+    return
+  end
+  confirmingCodexReset = false
+  local nonce = (tonumber(noctalia.state.get("codex_reset_request")) or 0) + 1
+  noctalia.state.set("codex_reset_request", nonce)
+  render()
 end
 
 noctalia.state.watch("usage_providers", function(value)
@@ -212,8 +305,23 @@ noctalia.state.watch("usage_last_refresh", function(value)
   render()
 end)
 
+noctalia.state.watch("codex_reset_in_flight", function(value)
+  codexResetInFlight = value == true
+  render()
+end)
+
+noctalia.state.watch("codex_reset_error", function(value)
+  codexResetError = tostring(value or "")
+  render()
+end)
+
 function onConfigChanged()
   render()
 end
 
+function update()
+  render()
+end
+
+noctalia.setUpdateInterval(60000)
 render()

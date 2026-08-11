@@ -26,16 +26,16 @@ noctalia msg panel-toggle felipemayerdev/ai-usage-panel:usage-panel
 ```
 
 The service refreshes all enabled providers concurrently. A refresh already in progress is reused rather than duplicated. If a transient request fails after a successful refresh, the UI keeps the last result and marks it stale.
-Equivalent rolling windows use the same duration labels across providers—for example, `5 hours` and `7 days`—instead of provider-specific names such as “primary” and “secondary”. Reset timestamps use one `DD/MM · HH:MM UTC` format.
+Equivalent rolling windows use the same duration labels across providers—for example, `5 hours` and `7 days`—instead of provider-specific names such as “primary” and “secondary”. Each reset is shown as remaining days and hours, or hours and minutes when less than one day remains.
 
-Provider cards use compact single-line quota rows. Plan/account metadata stays in the card header, while implementation-source details remain hidden.
+Provider cards use compact single-line quota rows. Plan/account metadata stays in the card header, while implementation-source details remain hidden. The Codex card also shows saved rate-limit reset credits and how many are currently usable. `Reset now` remains disabled unless the API marks a credit applicable, then requires a separate destructive confirmation before consuming it.
 
 ## Providers
 
 | Provider ID | Authentication and data source | Extra command |
 |---|---|---|
 | `claude` | Reads the active Claude Code OAuth session from `~/.claude/.credentials.json`; requests `api.anthropic.com/api/oauth/usage`. | None |
-| `codex` | Reads the active Codex CLI OAuth session from `~/.codex/auth.json`; requests the Codex usage API. | None |
+| `codex` | Reads the active Codex CLI OAuth session from `~/.codex/auth.json`; requests usage and reset-credit availability from the Codex API. | None |
 | `copilot` | Reads the active GitHub CLI token and requests GitHub's premium-request billing API. | `gh` |
 | `zen` | Uses the upstream browser-cookie collector. | `zen-balance` |
 | `zai` | Uses the API key stored in Noctalia plugin settings and requests `api.z.ai` directly. | None |
@@ -56,7 +56,7 @@ uv tool install --from plasma-ai-usage-panel zen-balance
 | Refresh interval | 120 seconds | Automatic refresh cadence, from 30 to 3600 seconds. |
 | Provider icons and usage | Off | Show only each provider icon and its current usage percentage in the bar. |
 | Bar font size | 12 | Font size for provider names, values, and compact usage percentages, from 8 to 24. |
-| Show reset times | On | Show each quota window's reset timestamp in the panel. |
+| Show reset countdowns | On | Show the remaining time until each quota window resets. |
 | Copilot monthly quota | 300 | Allowance used to calculate Copilot's displayed percentage. |
 | Z.ai API key | Empty | API key from `z.ai/manage-apikey/apikey-list`. |
 
