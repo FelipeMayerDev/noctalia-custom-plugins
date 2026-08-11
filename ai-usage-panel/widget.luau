@@ -133,9 +133,6 @@ local function render()
   barWidget.render(container({ gap = 8, align = "center" }, children))
 end
 
-function onClick()
-  noctalia.panel.toggle("usage-panel")
-end
 
 function onRightClick()
   local nonce = (tonumber(noctalia.state.get("usage_refresh_request")) or 0) + 1
