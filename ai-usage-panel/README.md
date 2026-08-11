@@ -55,7 +55,6 @@ uv tool install --from plasma-ai-usage-panel zen-balance
 | Refresh interval | 120 seconds | Automatic refresh cadence, from 30 to 3600 seconds. |
 | Compact bar labels | Off | Show provider abbreviations instead of names and quota values. |
 | Show reset times | On | Show each quota window's reset timestamp in the panel. |
-| Refresh when opening | On | Request fresh usage whenever the panel opens. |
 | Copilot monthly quota | 300 | Allowance used to calculate Copilot's displayed percentage. |
 | Z.ai API key | Empty | API key from `z.ai/manage-apikey/apikey-list`. |
 

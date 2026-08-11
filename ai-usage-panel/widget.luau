@@ -101,10 +101,6 @@ local function render()
 end
 
 function onClick()
-  if noctalia.getConfig("refresh_on_open") == true then
-    local nonce = (tonumber(noctalia.state.get("usage_refresh_request")) or 0) + 1
-    noctalia.state.set("usage_refresh_request", nonce)
-  end
   noctalia.panel.toggle("usage-panel")
 end
 

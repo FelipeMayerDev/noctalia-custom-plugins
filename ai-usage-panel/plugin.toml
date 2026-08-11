@@ -1,6 +1,6 @@
 id = "felipemayerdev/ai-usage-panel"
 name = "AI Usage Panel"
-version = "1.1.1"
+version = "1.1.2"
 plugin_api = 3
 author = "FelipeMayerDev"
 license = "MIT"
@@ -39,12 +39,6 @@ label_key = "settings.show_reset_time.label"
 description_key = "settings.show_reset_time.description"
 default = true
 
-[[setting]]
-key = "refresh_on_open"
-type = "bool"
-label_key = "settings.refresh_on_open.label"
-description_key = "settings.refresh_on_open.description"
-default = true
 
 [[setting]]
 key = "copilot_monthly_quota"

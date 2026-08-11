@@ -40,10 +40,6 @@
       "label": "Show reset times",
       "description": "Show provider quota reset timestamps in the panel."
     },
-    "refresh_on_open": {
-      "label": "Refresh when opening",
-      "description": "Request fresh usage whenever the panel opens."
-    },
     "copilot_monthly_quota": {
       "label": "Copilot monthly quota",
       "description": "Premium request allowance used to calculate the Copilot percentage."

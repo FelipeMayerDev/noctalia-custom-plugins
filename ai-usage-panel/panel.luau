@@ -214,12 +214,6 @@ end)
 
 function onConfigChanged()
   render()
-  if noctalia.getConfig("refresh_on_open") == true then
-    refresh()
-  end
 end
 
 render()
-if noctalia.getConfig("refresh_on_open") == true then
-  refresh()
-end
