@@ -120,6 +120,8 @@ local function appendCodexResetControls(content, data)
       text = codexResetInFlight and tr("panel.resetting") or tr("panel.reset_now"),
       variant = "outline",
       controlSize = "sm",
+      fontSize = 9,
+      height = 20,
       enabled = applicable > 0 and data.stale ~= true and not codexResetInFlight,
       onClick = "onRequestCodexReset",
     }),

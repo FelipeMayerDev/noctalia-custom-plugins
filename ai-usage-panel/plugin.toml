@@ -1,6 +1,6 @@
 id = "felipemayerdev/ai-usage-panel"
 name = "AI Usage Panel"
-version = "1.4.0"
+version = "1.4.1"
 plugin_api = 14
 author = "FelipeMayerDev"
 license = "MIT"
