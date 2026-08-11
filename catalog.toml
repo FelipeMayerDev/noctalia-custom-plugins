@@ -1,0 +1,41 @@
+# Noctalia 5 plugin source catalog.
+# Keep one [[plugin]] entry per top-level plugin directory.
+
+[[plugin]]
+id = "felipemayerdev/ai-usage-panel"
+name = "AI Usage Panel"
+version = "1.0.0"
+updated_at = 1786415333
+added_at = 1786415333
+author = "FelipeMayerDev"
+license = "MIT"
+icon = "chart-bar"
+description = "Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the Noctalia bar."
+plugin_api = 3
+tags = ["ai", "bar", "panel", "system"]
+
+[[plugin]]
+id = "felipemayerdev/hermes-agent"
+name = "Hermes Agent"
+version = "2.0.0"
+updated_at = 1786415333
+added_at = 1786415333
+author = "nomadx"
+license = "MIT"
+icon = "sparkles"
+description = "Noctalia status, chat panel, and launcher integration for Hermes Agent."
+plugin_api = 8
+tags = ["ai", "bar", "launcher", "panel", "service"]
+
+[[plugin]]
+id = "felipemayerdev/hermes-ssh-chat"
+name = "Hermes SSH Terminal"
+version = "2.0.0"
+updated_at = 1786415333
+added_at = 1786415333
+author = "focky"
+license = "MIT"
+icon = "terminal-2"
+description = "Launch Hermes on a remote server through SSH from Noctalia."
+plugin_api = 3
+tags = ["ai", "bar", "development", "network", "panel"]

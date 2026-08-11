@@ -24,7 +24,7 @@ Custom plugins for [Noctalia Shell 5](https://github.com/noctalia-dev/noctalia).
 3. Update the source, then enable the desired plugin.
 4. Add its widget from the bar editor. Plugin panels and launcher providers become available when the plugin is enabled.
 
-Noctalia 5 discovers each top-level `plugin.toml`; `registry.json` and the QML `manifest.json` files are only retained for legacy Noctalia 4 installations.
+For git sources, Noctalia 5 discovers available plugins through the root `catalog.toml` and validates each top-level `plugin.toml` when enabling it. `registry.json` and the QML `manifest.json` files are retained only for legacy Noctalia 4 installations.
 
 ### Command line
 
