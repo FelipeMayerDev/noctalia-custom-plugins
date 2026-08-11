@@ -1,6 +1,6 @@
 id = "felipemayerdev/ai-usage-panel"
 name = "AI Usage Panel"
-version = "1.1.2"
+version = "1.2.0"
 plugin_api = 3
 author = "FelipeMayerDev"
 license = "MIT"
@@ -65,8 +65,8 @@ entry = "widget.luau"
 [[panel]]
 id = "usage-panel"
 entry = "panel.luau"
-width = 520
-height = 680
+width = 480
+height = 520
 placement = "floating"
 position = "center"
 

@@ -76,23 +76,22 @@ end
 
 local function quotaWindowNode(item, index)
   local percentage = math.clamp(tonumber(item.percentage) or 0, 0, 100)
-  local nodes = {
-    ui.row({ gap = 8 }, {
-      ui.label({ text = periodLabel(item) }),
-      ui.spacer({ flexGrow = 1 }),
-      ui.label({ text = string.format("%.0f%%", percentage), fontWeight = "bold" }),
-    }),
-    ui.progress({ progress = percentage / 100 }),
+  local children = {
+    ui.label({ text = periodLabel(item), fontSize = 11, maxWidth = 64 }),
+    ui.progress({ progress = percentage / 100, width = 108, height = 5, radius = 3 }),
+    ui.label({ text = string.format("%.0f%%", percentage), fontSize = 11, fontWeight = "bold", maxWidth = 36 }),
   }
   local reset = formatReset(item.resets_at)
   if noctalia.getConfig("show_reset_time") ~= false and reset ~= "" then
-    table.insert(nodes, ui.label({
-      text = tr("panel.resets") .. " " .. reset,
+    table.insert(children, ui.spacer({ flexGrow = 1 }))
+    table.insert(children, ui.label({
+      text = reset,
+      fontSize = 10,
       color = "on_surface_variant",
-      maxLines = 2,
+      maxLines = 1,
     }))
   end
-  return ui.column({ key = `window={index}`, gap = 4 }, nodes)
+  return ui.row({ key = `window={index}`, gap = 6, align = "center" }, children)
 end
 
 local function providerCard(provider, data)
@@ -100,49 +99,49 @@ local function providerCard(provider, data)
   if type(data) == "table" then
     headerValue = tostring(data.summary or "—")
   end
-  local content = {
-    ui.row({ gap = 10, align = "center" }, {
-      ui.glyph({ name = provider.glyph, size = 20, color = provider.color }),
-      ui.label({ text = provider.label, fontWeight = "bold" }),
-      ui.spacer({ flexGrow = 1 }),
-      ui.label({ text = headerValue, fontWeight = "bold", color = provider.color }),
-    }),
+  local header = {
+    ui.glyph({ name = provider.glyph, size = 16, color = provider.color }),
+    ui.label({ text = provider.label, fontSize = 13, fontWeight = "bold" }),
   }
+  if type(data) == "table" and type(data.details) == "string" and data.details ~= "" and data.details:find("\n", 1, true) == nil and #data.details <= 40 then
+    table.insert(header, ui.label({ text = "· " .. data.details, fontSize = 10, color = "on_surface_variant" }))
+  end
+  table.insert(header, ui.spacer({ flexGrow = 1 }))
+  table.insert(header, ui.label({ text = headerValue, fontSize = 13, fontWeight = "bold", color = provider.color }))
 
+  local content = {
+    ui.row({ gap = 6, align = "center" }, header),
+  }
   if type(data) ~= "table" then
-    table.insert(content, ui.label({ text = tr("panel.waiting"), color = "on_surface_variant" }))
+    table.insert(content, ui.label({ text = tr("panel.waiting"), fontSize = 10, color = "on_surface_variant" }))
   elseif data.status ~= "ok" and data.stale ~= true then
     table.insert(content, ui.label({
       text = tostring(data.error or tr("panel.unavailable")),
+      fontSize = 10,
       color = "error",
-      maxLines = 4,
+      maxLines = 2,
     }))
   else
     for index, item in ipairs(data.windows or {}) do
       table.insert(content, quotaWindowNode(item, index))
     end
-    if type(data.details) == "string" and data.details ~= "" then
-      table.insert(content, ui.label({ text = data.details, color = "on_surface_variant", maxLines = 3 }))
-    end
     if data.stale == true then
       table.insert(content, ui.label({
         text = tr("panel.stale") .. ": " .. tostring(data.error or ""),
+        fontSize = 10,
         color = "primary",
-        maxLines = 4,
+        maxLines = 2,
       }))
     end
   end
 
-  if type(data) == "table" and type(data.source) == "string" and data.source ~= "" then
-    table.insert(content, ui.label({ text = tr("panel.source") .. ": " .. data.source, color = "on_surface_variant" }))
-  end
-
   return ui.column({
     key = "provider=" .. provider.id,
-    padding = 14,
-    gap = 10,
-    fill = "surface_variant/0.55",
-    radius = 12,
+    paddingH = 10,
+    paddingV = 7,
+    gap = 5,
+    fill = "surface_variant/0.45",
+    radius = 8,
     border = "outline",
     borderWidth = 1,
   }, content)
@@ -158,11 +157,11 @@ local function render()
   end
   if #cards == 0 then
     table.insert(cards, ui.column({
-      padding = 20,
-      fill = "surface_variant/0.55",
-      radius = 12,
+      padding = 12,
+      fill = "surface_variant/0.45",
+      radius = 8,
     }, {
-      ui.label({ text = tr("panel.no_providers"), textAlign = "center", maxLines = 3 }),
+      ui.label({ text = tr("panel.no_providers"), fontSize = 11, textAlign = "center", maxLines = 2 }),
     }))
   end
 
@@ -171,21 +170,22 @@ local function render()
     status = tr("panel.updated") .. " " .. noctalia.formatTime("%H:%M", lastRefresh)
   end
 
-  panel.render(ui.column({ gap = 14, padding = 18 }, {
-    ui.row({ align = "center", gap = 10 }, {
-      ui.glyph({ name = "chart-bar", size = 24, color = "primary" }),
-      ui.label({ text = tr("panel.title"), fontWeight = "bold" }),
+  panel.render(ui.column({ gap = 8, padding = 12 }, {
+    ui.row({ align = "center", gap = 6 }, {
+      ui.glyph({ name = "chart-bar", size = 20, color = "primary" }),
+      ui.label({ text = tr("panel.title"), fontSize = 14, fontWeight = "bold" }),
       ui.spacer({ flexGrow = 1 }),
       ui.button({
         text = status,
         glyph = "refresh",
         variant = "ghost",
+        controlSize = "sm",
         enabled = not refreshing,
         onClick = "onRefresh",
       }),
-      ui.button({ glyph = "x", variant = "ghost", onClick = "onClose" }),
+      ui.button({ glyph = "x", variant = "ghost", controlSize = "sm", onClick = "onClose" }),
     }),
-    ui.scroll({ flexGrow = 1, gap = 10 }, cards),
+    ui.scroll({ flexGrow = 1, gap = 6 }, cards),
   }))
 end
 
