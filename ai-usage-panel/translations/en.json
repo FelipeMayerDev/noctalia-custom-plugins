@@ -33,8 +33,12 @@
       "description": "Seconds between usage refreshes."
     },
     "icon_only": {
-      "label": "Compact bar labels",
-      "description": "Show provider abbreviations instead of names and quota values."
+      "label": "Provider icons and usage",
+      "description": "Show only each provider icon and its current usage percentage in the bar."
+    },
+    "bar_font_size": {
+      "label": "Bar font size",
+      "description": "Font size for provider names, values, and compact usage percentages."
     },
     "show_reset_time": {
       "label": "Show reset times",

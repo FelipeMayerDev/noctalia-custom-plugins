@@ -1,6 +1,6 @@
 id = "felipemayerdev/ai-usage-panel"
 name = "AI Usage Panel"
-version = "1.2.1"
+version = "1.3.0"
 plugin_api = 3
 author = "FelipeMayerDev"
 license = "MIT"
@@ -31,6 +31,15 @@ type = "bool"
 label_key = "settings.icon_only.label"
 description_key = "settings.icon_only.description"
 default = false
+
+[[setting]]
+key = "bar_font_size"
+type = "int"
+label_key = "settings.bar_font_size.label"
+description_key = "settings.bar_font_size.description"
+default = 12
+min = 8
+max = 24
 
 [[setting]]
 key = "show_reset_time"

@@ -54,7 +54,8 @@ uv tool install --from plasma-ai-usage-panel zen-balance
 |---|---:|---|
 | Enabled providers | `claude`, `codex` | Provider IDs queried by the service: `claude`, `codex`, `copilot`, `zen`, `zai`. |
 | Refresh interval | 120 seconds | Automatic refresh cadence, from 30 to 3600 seconds. |
-| Compact bar labels | Off | Show provider abbreviations instead of names and quota values. |
+| Provider icons and usage | Off | Show only each provider icon and its current usage percentage in the bar. |
+| Bar font size | 12 | Font size for provider names, values, and compact usage percentages, from 8 to 24. |
 | Show reset times | On | Show each quota window's reset timestamp in the panel. |
 | Copilot monthly quota | 300 | Allowance used to calculate Copilot's displayed percentage. |
 | Z.ai API key | Empty | API key from `z.ai/manage-apikey/apikey-list`. |
@@ -65,7 +66,7 @@ The service reads Claude and Codex OAuth files on each refresh so CLI token rota
 
 ## Credits
 
-Original KDE Plasma widget and collector work by gustavobragac (NihilDigit). Noctalia port by FelipeMayerDev.
+Original KDE Plasma widget and collector work by gustavobragac (NihilDigit). Noctalia port by FelipeMayerDev. Claude, Codex, and Z.ai provider marks are sourced from [Lobe Icons](https://github.com/lobehub/lobe-icons) under the MIT license.
 
 ## License
 
