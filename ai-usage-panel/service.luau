@@ -119,11 +119,16 @@ local function pct(value)
   return math.clamp(tonumber(value) or 0, 0, 100)
 end
 
-local function window(label, percentage, resetsAt)
+local function window(periodSeconds, periodKey, percentage, resetsAt)
+  local normalizedReset = resetsAt
+  if type(normalizedReset) == "number" and normalizedReset > 100000000000 then
+    normalizedReset = math.floor(normalizedReset / 1000)
+  end
   return {
-    label = label,
+    period_seconds = tonumber(periodSeconds),
+    period_key = periodKey,
     percentage = pct(percentage),
-    resets_at = resetsAt,
+    resets_at = normalizedReset,
   }
 end
 
@@ -190,8 +195,8 @@ local function collectClaude(requestGeneration)
     local fiveHour = payload.five_hour or {}
     local sevenDay = payload.seven_day or {}
     local windows = {
-      window("5-hour", fiveHour.utilization, fiveHour.resets_at),
-      window("7-day", sevenDay.utilization, sevenDay.resets_at),
+      window(5 * 60 * 60, nil, fiveHour.utilization, fiveHour.resets_at),
+      window(7 * 24 * 60 * 60, nil, sevenDay.utilization, sevenDay.resets_at),
     }
     local plan = type(oauth.subscriptionType) == "string" and oauth.subscriptionType or ""
     finish(requestGeneration, "claude", normalizeWindowResult(windows, plan), nil)
@@ -228,12 +233,15 @@ local function collectCodex(requestGeneration)
       return
     end
     local limits = payload.rate_limit or {}
-    local primary = limits.primary_window or {}
-    local secondary = limits.secondary_window or {}
-    local windows = {
-      window("Primary", primary.used_percent, primary.reset_at),
-      window("Secondary", secondary.used_percent, secondary.reset_at),
-    }
+    local primary = limits.primary_window
+    local secondary = limits.secondary_window
+    local windows = {}
+    if type(primary) == "table" and primary.used_percent ~= nil then
+      table.insert(windows, window(primary.limit_window_seconds, "quota", primary.used_percent, primary.reset_at))
+    end
+    if type(secondary) == "table" and secondary.used_percent ~= nil then
+      table.insert(windows, window(secondary.limit_window_seconds, "quota", secondary.used_percent, secondary.reset_at))
+    end
     local details = tostring(payload.plan_type or "")
     if payload.credits ~= nil and type(payload.credits) == "table" and payload.credits.balance ~= nil then
       details ..= details ~= "" and ` · {payload.credits.balance} credits` or `{payload.credits.balance} credits`
@@ -286,7 +294,7 @@ local function collectCopilot(requestGeneration)
           percentage = percentage,
           summary = string.format("%.0f / %d", used, quota),
           details = login,
-          windows = { window("Monthly", percentage, nil) },
+          windows = { window(nil, "monthly", percentage, nil) },
         }, nil)
       end)
     end)
@@ -350,16 +358,17 @@ local function collectZai(requestGeneration)
     local limits = ((payload.data or {}).limits or {})
     local windows = {}
     for _, item in ipairs(limits) do
-      local label = nil
+      local periodSeconds = nil
+      local periodKey = nil
       if (item.type == "CREDIT_LIMIT" or item.type == "TOKENS_LIMIT") and item.unit == 3 and item.number == 5 then
-        label = "5-hour"
+        periodSeconds = 5 * 60 * 60
       elseif (item.type == "CREDIT_LIMIT" or item.type == "TOKENS_LIMIT") and item.unit == 6 and item.number == 1 then
-        label = "7-day"
+        periodSeconds = 7 * 24 * 60 * 60
       elseif item.type == "TIME_LIMIT" then
-        label = "Tools"
+        periodKey = "tools"
       end
-      if label ~= nil then
-        table.insert(windows, window(label, item.percentage, item.nextResetTime))
+      if periodSeconds ~= nil or periodKey ~= nil then
+        table.insert(windows, window(periodSeconds, periodKey, item.percentage, item.nextResetTime))
       end
     end
     if #windows == 0 then

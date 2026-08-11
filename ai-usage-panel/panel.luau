@@ -40,17 +40,45 @@ local function formatReset(value)
     return ""
   end
   if type(value) == "number" then
-    local seconds = value > 100000000000 and math.floor(value / 1000) or math.floor(value)
-    return noctalia.formatTime("%Y-%m-%d %H:%M", seconds)
+    return noctalia.formatTime("%d/%m · %H:%M UTC", math.floor(value), "UTC")
   end
-  return tostring(value):gsub("T", " "):gsub("%.000Z$", " UTC"):gsub("Z$", " UTC")
+  local raw = tostring(value)
+  local _, month, day, hour, minute = raw:match("^(%d%d%d%d)%-(%d%d)%-(%d%d)T(%d%d):(%d%d)")
+  if month ~= nil then
+    local zone = (raw:match("Z$") ~= nil or raw:match("%+00:00$") ~= nil) and "UTC" or tostring(raw:match("([+-]%d%d:%d%d)$") or "")
+    return string.format("%s/%s · %s:%s%s", day, month, hour, minute, zone ~= "" and " " .. zone or "")
+  end
+  return raw
+end
+
+local function periodLabel(item)
+  local seconds = tonumber(item.period_seconds)
+  if seconds ~= nil and seconds > 0 then
+    if seconds % (24 * 60 * 60) == 0 then
+      local days = math.floor(seconds / (24 * 60 * 60))
+      return string.format(tr(days == 1 and "period.day" or "period.days"), days)
+    end
+    if seconds % (60 * 60) == 0 then
+      local hours = math.floor(seconds / (60 * 60))
+      return string.format(tr(hours == 1 and "period.hour" or "period.hours"), hours)
+    end
+    local minutes = math.max(1, math.floor(seconds / 60))
+    return string.format(tr(minutes == 1 and "period.minute" or "period.minutes"), minutes)
+  end
+  local key = tostring(item.period_key or "")
+  if key == "monthly" then
+    return tr("period.monthly")
+  elseif key == "tools" then
+    return tr("period.tools")
+  end
+  return tostring(item.label or tr("period.quota"))
 end
 
 local function quotaWindowNode(item, index)
   local percentage = math.clamp(tonumber(item.percentage) or 0, 0, 100)
   local nodes = {
     ui.row({ gap = 8 }, {
-      ui.label({ text = tostring(item.label or tr("panel.quota")) }),
+      ui.label({ text = periodLabel(item) }),
       ui.spacer({ flexGrow = 1 }),
       ui.label({ text = string.format("%.0f%%", percentage), fontWeight = "bold" }),
     }),
@@ -99,7 +127,7 @@ local function providerCard(provider, data)
     if data.stale == true then
       table.insert(content, ui.label({
         text = tr("panel.stale") .. ": " .. tostring(data.error or ""),
-        color = "warning",
+        color = "primary",
         maxLines = 4,
       }))
     end

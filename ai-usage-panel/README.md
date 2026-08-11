@@ -26,6 +26,8 @@ noctalia msg panel-toggle felipemayerdev/ai-usage-panel:usage-panel
 ```
 
 The service refreshes all enabled providers concurrently. A refresh already in progress is reused rather than duplicated. If a transient request fails after a successful refresh, the UI keeps the last result and marks it stale.
+Equivalent rolling windows use the same duration labels across providers—for example, `5 hours` and `7 days`—instead of provider-specific names such as “primary” and “secondary”. Reset timestamps use one `DD/MM · HH:MM UTC` format.
+
 
 ## Providers
 

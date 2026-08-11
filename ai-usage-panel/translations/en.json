@@ -12,6 +12,17 @@
     "resets": "Resets",
     "no_providers": "Enable at least one provider in plugin settings."
   },
+  "period": {
+    "minute": "%d minute",
+    "minutes": "%d minutes",
+    "hour": "%d hour",
+    "hours": "%d hours",
+    "day": "%d day",
+    "days": "%d days",
+    "monthly": "Monthly",
+    "tools": "Tools",
+    "quota": "Quota"
+  },
   "settings": {
     "enabled_providers": {
       "label": "Enabled providers",
