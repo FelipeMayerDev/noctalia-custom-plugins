@@ -1,11 +1,11 @@
 --!nonstrict
 
 local PROVIDERS = {
-  { id = "claude", label = "Claude", glyph = "sparkles", color = "#DE7356" },
-  { id = "codex", label = "Codex", glyph = "code", color = "#74A9C9" },
+  { id = "claude", label = "Claude", icon = "assets/claude.svg", color = "#D97757" },
+  { id = "codex", label = "Codex", icon = "assets/codex.svg", color = "#74A9C9" },
   { id = "copilot", label = "Copilot", glyph = "brand-github", color = "#8B5CF6" },
   { id = "zen", label = "OpenCode Zen", glyph = "coins", color = "#DE7356" },
-  { id = "zai", label = "Z.ai", glyph = "brain", color = "#126EF4" },
+  { id = "zai", label = "Z.ai", icon = "assets/zai.svg", color = "#126EF4" },
 }
 
 local providerData = noctalia.state.get("usage_providers") or {}
@@ -31,6 +31,13 @@ local function providerFor(id)
     end
   end
   return nil
+end
+
+local function providerIconNode(provider, size)
+  if provider.icon ~= nil then
+    return ui.image({ path = provider.icon, width = size, height = size, fit = "contain" })
+  end
+  return ui.glyph({ name = provider.glyph, size = size, color = provider.color })
 end
 
 local function refresh()
@@ -108,6 +115,9 @@ local function appendCodexResetControls(content, data)
     return
   end
   local available = math.max(0, tonumber(resetCredits.available_count) or 0)
+  if available <= 0 then
+    return
+  end
   local applicable = math.max(0, tonumber(resetCredits.applicable_available_count) or 0)
   local nextExpiry = nil
   for _, credit in ipairs(resetCredits.credits or {}) do
@@ -171,7 +181,7 @@ local function providerCard(provider, data)
     headerValue = tostring(data.summary or "—")
   end
   local header = {
-    ui.glyph({ name = provider.glyph, size = 16, color = provider.color }),
+    providerIconNode(provider, 16),
     ui.label({ text = provider.label, fontSize = 13, fontWeight = "bold" }),
   }
   if type(data) == "table" and type(data.details) == "string" and data.details ~= "" and data.details:find("\n", 1, true) == nil and #data.details <= 40 then
@@ -306,6 +316,11 @@ end
 
 noctalia.state.watch("usage_providers", function(value)
   providerData = type(value) == "table" and value or {}
+  local codexData = providerData.codex
+  local resetCredits = type(codexData) == "table" and codexData.reset_credits or nil
+  if type(resetCredits) ~= "table" or (tonumber(resetCredits.available_count) or 0) <= 0 then
+    confirmingCodexReset = false
+  end
   render()
 end)
 
