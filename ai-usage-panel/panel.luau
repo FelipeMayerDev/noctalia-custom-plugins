@@ -109,11 +109,23 @@ local function appendCodexResetControls(content, data)
   end
   local available = math.max(0, tonumber(resetCredits.available_count) or 0)
   local applicable = math.max(0, tonumber(resetCredits.applicable_available_count) or 0)
+  local nextExpiry = nil
+  for _, credit in ipairs(resetCredits.credits or {}) do
+    local expiresAt = tonumber(credit.expires_at)
+    if expiresAt ~= nil and (nextExpiry == nil or expiresAt < nextExpiry) then
+      nextExpiry = expiresAt
+    end
+  end
+  local resetStatus = string.format(tr("panel.codex_resets"), available, applicable)
+  if nextExpiry ~= nil then
+    resetStatus ..= " · " .. string.format(tr("panel.reset_expires"), formatRemaining(nextExpiry))
+  end
   table.insert(content, ui.row({ gap = 6, align = "center" }, {
     ui.label({
-      text = string.format(tr("panel.codex_resets"), available, applicable),
-      fontSize = 10,
+      text = resetStatus,
+      fontSize = 9,
       color = "on_surface_variant",
+      maxLines = 1,
     }),
     ui.spacer({ flexGrow = 1 }),
     ui.button({
@@ -126,22 +138,6 @@ local function appendCodexResetControls(content, data)
       onClick = "onRequestCodexReset",
     }),
   }))
-  local nextExpiry = nil
-  for _, credit in ipairs(resetCredits.credits or {}) do
-    local expiresAt = tonumber(credit.expires_at)
-    if expiresAt ~= nil and (nextExpiry == nil or expiresAt < nextExpiry) then
-      nextExpiry = expiresAt
-    end
-  end
-  if nextExpiry ~= nil then
-    local expiresText = formatRemaining(nextExpiry)
-    table.insert(content, ui.label({
-      text = string.format(tr("panel.reset_expires"), expiresText),
-      fontSize = 10,
-      color = "on_surface_variant",
-      maxLines = 1,
-    }))
-  end
   if confirmingCodexReset then
     table.insert(content, ui.column({
       gap = 5,
