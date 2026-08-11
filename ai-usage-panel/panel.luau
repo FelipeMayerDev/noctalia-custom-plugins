@@ -126,6 +126,22 @@ local function appendCodexResetControls(content, data)
       onClick = "onRequestCodexReset",
     }),
   }))
+  local nextExpiry = nil
+  for _, credit in ipairs(resetCredits.credits or {}) do
+    local expiresAt = tonumber(credit.expires_at)
+    if expiresAt ~= nil and (nextExpiry == nil or expiresAt < nextExpiry) then
+      nextExpiry = expiresAt
+    end
+  end
+  if nextExpiry ~= nil then
+    local expiresText = noctalia.formatTime("%d/%m · %H:%M UTC", math.floor(nextExpiry), "UTC")
+    table.insert(content, ui.label({
+      text = string.format(tr("panel.reset_expires"), expiresText),
+      fontSize = 10,
+      color = "on_surface_variant",
+      maxLines = 1,
+    }))
+  end
   if confirmingCodexReset then
     table.insert(content, ui.column({
       gap = 5,

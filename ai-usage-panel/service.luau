@@ -280,13 +280,34 @@ local function collectCodex(requestGeneration)
       details ..= details ~= "" and ` · {payload.credits.balance} credits` or `{payload.credits.balance} credits`
     end
     local result = normalizeWindowResult(windows, details)
-    if type(payload.rate_limit_reset_credits) == "table" then
-      result.reset_credits = {
-        available_count = math.max(0, tonumber(payload.rate_limit_reset_credits.available_count) or 0),
-        applicable_available_count = math.max(0, tonumber(payload.rate_limit_reset_credits.applicable_available_count) or 0),
-      }
+    if type(payload.rate_limit_reset_credits) ~= "table" then
+      finish(requestGeneration, "codex", result, nil)
+      return
     end
-    finish(requestGeneration, "codex", result, nil)
+    result.reset_credits = {
+      available_count = math.max(0, tonumber(payload.rate_limit_reset_credits.available_count) or 0),
+      applicable_available_count = math.max(0, tonumber(payload.rate_limit_reset_credits.applicable_available_count) or 0),
+      credits = {},
+    }
+    httpJson({
+      url = "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits",
+      headers = headers,
+    }, function(resetPayload, _resetError)
+      if type(resetPayload) == "table" then
+        if resetPayload.available_count ~= nil then
+          result.reset_credits.available_count = math.max(0, tonumber(resetPayload.available_count) or 0)
+        end
+        for _, credit in ipairs(resetPayload.credits or {}) do
+          if type(credit) == "table" and credit.status == "available" then
+            table.insert(result.reset_credits.credits, {
+              title = tostring(credit.title or ""),
+              expires_at = timestampSeconds(credit.expires_at),
+            })
+          end
+        end
+      end
+      finish(requestGeneration, "codex", result, nil)
+    end)
   end)
 end
 

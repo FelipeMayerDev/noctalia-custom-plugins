@@ -28,14 +28,14 @@ noctalia msg panel-toggle felipemayerdev/ai-usage-panel:usage-panel
 The service refreshes all enabled providers concurrently. A refresh already in progress is reused rather than duplicated. If a transient request fails after a successful refresh, the UI keeps the last result and marks it stale.
 Equivalent rolling windows use the same duration labels across providers—for example, `5 hours` and `7 days`—instead of provider-specific names such as “primary” and “secondary”. Each reset is shown as remaining days and hours, or hours and minutes when less than one day remains.
 
-Provider cards use compact single-line quota rows. Plan/account metadata stays in the card header, while implementation-source details remain hidden. The Codex card also shows saved rate-limit reset credits and how many are currently usable. `Reset now` remains disabled unless the API marks a credit applicable, then requires a separate destructive confirmation before consuming it.
+Provider cards use compact single-line quota rows. Plan/account metadata stays in the card header, while implementation-source details remain hidden. The Codex card also shows saved rate-limit reset credits, how many are currently usable, and the next credit expiration in UTC. `Reset now` remains disabled unless the API marks a credit applicable, then requires a separate destructive confirmation before consuming it.
 
 ## Providers
 
 | Provider ID | Authentication and data source | Extra command |
 |---|---|---|
 | `claude` | Reads the active Claude Code OAuth session from `~/.claude/.credentials.json`; requests `api.anthropic.com/api/oauth/usage`. | None |
-| `codex` | Reads the active Codex CLI OAuth session from `~/.codex/auth.json`; requests usage and reset-credit availability from the Codex API. | None |
+| `codex` | Reads the active Codex CLI OAuth session from `~/.codex/auth.json`; requests usage, reset-credit availability, and expiry details from the Codex API. | None |
 | `copilot` | Reads the active GitHub CLI token and requests GitHub's premium-request billing API. | `gh` |
 | `zen` | Uses the upstream browser-cookie collector. | `zen-balance` |
 | `zai` | Uses the API key stored in Noctalia plugin settings and requests `api.z.ai` directly. | None |
