@@ -1,0 +1,73 @@
+id = "felipemayerdev/hermes-ssh-chat"
+name = "Hermes SSH Terminal"
+version = "2.0.0"
+plugin_api = 3
+author = "focky"
+license = "MIT"
+description = "Launch Hermes on a remote server through SSH from Noctalia."
+dependencies = ["ssh", "hermes"]
+tags = ["ai", "bar", "development", "network", "panel"]
+icon = "terminal-2"
+
+[[setting]]
+key = "host"
+type = "string"
+label_key = "settings.host.label"
+description_key = "settings.host.description"
+default = ""
+
+[[setting]]
+key = "port"
+type = "int"
+label_key = "settings.port.label"
+default = 22
+min = 1
+max = 65535
+
+[[setting]]
+key = "user"
+type = "string"
+label_key = "settings.user.label"
+default = ""
+
+[[setting]]
+key = "remote_command"
+type = "string"
+label_key = "settings.remote_command.label"
+description_key = "settings.remote_command.description"
+default = "hermes"
+
+[[setting]]
+key = "identity_file"
+type = "file"
+label_key = "settings.identity_file.label"
+description_key = "settings.identity_file.description"
+default = ""
+advanced = true
+
+[[setting]]
+key = "extra_ssh_args"
+type = "string"
+label_key = "settings.extra_ssh_args.label"
+description_key = "settings.extra_ssh_args.description"
+default = ""
+advanced = true
+
+[[setting]]
+key = "show_bar_text"
+type = "bool"
+label_key = "settings.show_bar_text.label"
+description_key = "settings.show_bar_text.description"
+default = true
+
+[[widget]]
+id = "remote"
+entry = "widget.luau"
+
+[[panel]]
+id = "terminal-panel"
+entry = "panel.luau"
+width = 520
+height = 430
+placement = "floating"
+position = "center"

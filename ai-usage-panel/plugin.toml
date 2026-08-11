@@ -1,0 +1,71 @@
+id = "felipemayerdev/ai-usage-panel"
+name = "AI Usage Panel"
+version = "1.0.0"
+plugin_api = 3
+author = "FelipeMayerDev"
+license = "MIT"
+description = "Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the Noctalia bar."
+dependencies = ["claude-usage", "codex-usage", "copilot-usage", "zen-balance", "zai-usage"]
+tags = ["ai", "bar", "panel", "system"]
+icon = "chart-bar"
+
+[[setting]]
+key = "enabled_providers"
+type = "string_list"
+label_key = "settings.enabled_providers.label"
+description_key = "settings.enabled_providers.description"
+default = ["claude", "codex"]
+
+[[setting]]
+key = "refresh_interval_seconds"
+type = "int"
+label_key = "settings.refresh_interval.label"
+description_key = "settings.refresh_interval.description"
+default = 120
+min = 30
+max = 3600
+
+[[setting]]
+key = "icon_only"
+type = "bool"
+label_key = "settings.icon_only.label"
+description_key = "settings.icon_only.description"
+default = false
+
+[[setting]]
+key = "show_reset_time"
+type = "bool"
+label_key = "settings.show_reset_time.label"
+description_key = "settings.show_reset_time.description"
+default = true
+
+[[setting]]
+key = "refresh_on_open"
+type = "bool"
+label_key = "settings.refresh_on_open.label"
+description_key = "settings.refresh_on_open.description"
+default = true
+
+[[setting]]
+key = "zai_token"
+type = "string"
+label_key = "settings.zai_token.label"
+description_key = "settings.zai_token.description"
+default = ""
+advanced = true
+
+[[widget]]
+id = "usage"
+entry = "widget.luau"
+
+[[panel]]
+id = "usage-panel"
+entry = "panel.luau"
+width = 460
+height = 620
+placement = "floating"
+position = "center"
+
+[[service]]
+id = "usage-service"
+entry = "service.luau"

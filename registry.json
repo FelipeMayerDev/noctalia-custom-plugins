@@ -2,22 +2,20 @@
   "version": 1,
   "plugins": [
     {
-      "id": "hermes-ssh-chat",
-      "name": "Hermes SSH Terminal",
-      "version": "1.0.0",
+      "id": "ai-usage-panel",
+      "name": "AI Usage Panel",
+      "version": "0.1.0",
       "official": false,
       "author": "FelipeMayerDev",
-      "description": "Use Hermes on a remote server through an interactive SSH terminal.",
+      "description": "Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the Noctalia bar. Noctalia port of gustavobragac's plasma-ai-usage-panel.",
       "repository": "https://github.com/FelipeMayerDev/noctalia-custom-plugins",
-      "minNoctaliaVersion": "4.6.6",
       "license": "MIT",
       "tags": [
         "Bar",
         "Panel",
-        "Development",
         "AI"
       ],
-      "lastUpdated": "2026-06-20T15:22:34-03:00"
+      "lastUpdated": "2026-06-20T15:48:00-03:00"
     },
     {
       "id": "hermes-agent",
@@ -38,20 +36,22 @@
       "lastUpdated": "2026-06-20T16:40:00-03:00"
     },
     {
-      "id": "ai-usage-panel",
-      "name": "AI Usage Panel",
-      "version": "0.1.0",
+      "id": "hermes-ssh-chat",
+      "name": "Hermes SSH Terminal",
+      "version": "1.0.0",
       "official": false,
       "author": "FelipeMayerDev",
-      "description": "Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the Noctalia bar. Noctalia port of gustavobragac's plasma-ai-usage-panel.",
+      "description": "Use Hermes on a remote server through an interactive SSH terminal.",
       "repository": "https://github.com/FelipeMayerDev/noctalia-custom-plugins",
+      "minNoctaliaVersion": "4.6.6",
       "license": "MIT",
       "tags": [
         "Bar",
         "Panel",
+        "Development",
         "AI"
       ],
-      "lastUpdated": "2026-06-20T15:48:00-03:00"
+      "lastUpdated": "2026-06-20T15:22:34-03:00"
     }
   ]
 }

@@ -1,112 +1,62 @@
 # Hermes SSH Terminal
 
-Run **Hermes Agent** on a remote machine from the Noctalia bar through an interactive SSH terminal.
+Launch Hermes Agent on a remote machine from Noctalia 5 through an interactive SSH terminal.
 
 ![Hermes SSH Terminal preview](preview.png)
 
-## Features
+| Plugin | Value |
+|---|---|
+| ID | `felipemayerdev/hermes-ssh-chat` |
+| Bar widget | `remote` |
+| Panel | `terminal-panel` |
 
-- Bar widget with the Hermes Agent icon.
-- Interactive SSH session that launches `hermes` on the remote host.
-- Terminal-like input for Enter, Backspace, arrow keys, Ctrl+C, Ctrl+D, Ctrl+L, and Tab.
-- Panel state survives closing and reopening while the SSH session is active.
-- Optional automatic connection on Noctalia startup.
-- Passwords are never saved; use SSH keys for unattended startup connections.
+## Usage
+
+1. Enable `felipemayerdev/hermes-ssh-chat`.
+2. Configure the SSH host, port, user, and remote command in plugin settings.
+3. Add **Hermes SSH Terminal → remote** to the bar.
+4. Click the widget, optionally adjust the target for this launch, then select **Open SSH terminal**.
+5. Open the panel directly with:
+
+   ```bash
+   noctalia msg panel-toggle felipemayerdev/hermes-ssh-chat:terminal-panel
+   ```
+
+Right-click the bar widget to reopen plugin settings.
+
+Noctalia 5 plugin panels are declarative controls rather than embeddable QML terminal surfaces. This port therefore launches the configured system terminal through `noctalia.runInTerminal`; the real terminal owns the PTY, rendering, keyboard handling, host-key confirmation, and password prompt. Credentials are never read or stored by the plugin.
 
 ## Requirements
 
-- Noctalia Shell >= 4.6.6.
-- `python3` and `ssh` on the local machine.
-- `hermes` available in `PATH` on the remote host.
-- SSH key authentication for `Connect on startup`.
+- `ssh` on the local machine
+- `hermes` available on the remote host
+- A terminal configured in Noctalia
 
-## Installation
-
-Install from Noctalia's plugin browser when available, then:
-
-1. Enable **Hermes SSH Terminal** in Settings -> Plugins.
-2. Add the bar widget in Settings -> Bar.
-3. Open the widget and configure the SSH host, port, and user.
-
-## Keyboard shortcut
-
-You bind a physical key in your compositor; the plugin handles the toggle. The
-chosen key opens and closes the panel, and an active SSH session is focused on
-open so you can type immediately.
-
-### IPC bind (works on every compositor — recommended)
-
-The plugin exposes IPC commands (`toggle`, `open`, `close`). Bind a key to call:
-
-```bash
-qs -c noctalia-shell ipc call plugin:hermes-ssh-chat toggle
-```
-
-**Niri** (`config.kdl`) — add inside your `binds { ... }` block:
-
-```kdl
-binds {
-    Mod+H { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:hermes-ssh-chat" "toggle"; }
-}
-```
-
-**Hyprland** (`hyprland.conf`):
-
-```ini
-bind = SUPER, H, exec, qs -c noctalia-shell ipc call plugin:hermes-ssh-chat toggle
-```
-
-**Mango**:
-
-```bash
-bind=SUPER,H,spawn_shell,noctalia-shell ipc call plugin:hermes-ssh-chat toggle
-```
-
-### Hyprland global shortcut (optional — uses the settings field)
-
-Only on Hyprland (needs `hyprland_global_shortcuts_v1`). The plugin registers a
-global shortcut named in **Settings -> Plugins -> Hermes SSH Terminal -> Toggle
-shortcut name** (default `hermes-toggle`). Bind a key to it:
-
-```ini
-bind = SUPER, H, global, noctalia:hermes-toggle
-```
-
-Use the same name on both sides. On Niri/Mango this method is inert — use the
-IPC bind above.
+SSH key authentication is recommended. Existing `~/.ssh/config`, agent, known-host, proxy, and control-master settings are honored by the system SSH client.
 
 ## Settings
 
-| Setting | Description |
-|---|---|
-| Default host / IP | Remote machine where `hermes` runs. |
-| Default user | SSH user for the remote machine. |
-| SSH port | SSH port, default `22`. |
-| Panel width / height | Preferred panel dimensions. |
-| Terminal columns / rows | PTY size sent to the remote session. |
-| Terminal font size | Font size used by the terminal renderer. |
-| Connect on startup | Starts the SSH session when Noctalia loads the plugin. |
-| Remember last target | Saves the last host, port, and user after connecting. |
-| Show text in bar | Shows the Hermes label next to the bar icon. |
-| Toggle shortcut name | Hyprland global shortcut id used to open/close the panel (default `hermes-toggle`). |
+| Setting | Default | Description |
+|---|---:|---|
+| Host | Empty | Remote hostname or address. |
+| Port | `22` | SSH server port. |
+| User | Empty | Optional SSH user. |
+| Remote command | `hermes` | Interactive remote command. |
+| Identity file | Empty | Optional key passed with `ssh -i`. |
+| Extra SSH arguments | Empty | Trusted arguments such as `-J bastion`. |
+| Show target in bar | On | Shows `user@host` beside the terminal glyph. |
+
+`Extra SSH arguments` is intentionally passed to the shell as command syntax. Only enter values you trust; prefer `~/.ssh/config` for complex connection policy.
 
 ## Troubleshooting
 
-### The panel connects but Hermes does not open
-
-Run this manually from a terminal and fix any remote shell issues first:
+Run the equivalent command directly before debugging the plugin:
 
 ```bash
-ssh -tt user@host "TERM=xterm-256color COLORTERM=truecolor hermes"
+ssh -p 22 -t user@host hermes
 ```
 
-### Connect on startup does not finish
-
-This option does not save passwords. Configure SSH key authentication for the target host.
-
-### The terminal display looks misaligned
-
-Increase the panel width or lower terminal columns in the plugin settings. Hermes uses a TUI and expects enough columns for its status and input lines.
+If clicking **Open SSH terminal** reports failure, configure a terminal in Noctalia and verify that terminal launching works elsewhere in the shell.
 
 ## Credits
 
@@ -114,4 +64,4 @@ The Hermes Agent icon is from [Lobe Icons](https://github.com/lobehub/lobe-icons
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).

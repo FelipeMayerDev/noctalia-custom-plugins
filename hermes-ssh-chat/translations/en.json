@@ -1,0 +1,43 @@
+{
+  "panel": {
+    "auth_note": "SSH handles host-key checks, keys, and password prompts in the external terminal.",
+    "close": "Close",
+    "connect": "Open SSH terminal",
+    "launch_failed": "No terminal could be opened.",
+    "launched": "SSH terminal launched.",
+    "missing_host": "Enter a remote host.",
+    "subtitle": "Launch an interactive Hermes session in your configured terminal.",
+    "title": "Hermes SSH Terminal"
+  },
+  "settings": {
+    "extra_ssh_args": {
+      "description": "Additional trusted arguments appended to the ssh command, for example -J bastion.",
+      "label": "Extra SSH arguments"
+    },
+    "host": {
+      "description": "Hostname or address of the server running Hermes.",
+      "label": "Host"
+    },
+    "identity_file": {
+      "description": "Optional private-key path passed to ssh with -i.",
+      "label": "Identity file"
+    },
+    "port": {
+      "label": "Port"
+    },
+    "remote_command": {
+      "description": "Interactive command executed after the SSH connection opens.",
+      "label": "Remote command"
+    },
+    "show_bar_text": {
+      "description": "Show user@host beside the terminal glyph.",
+      "label": "Show target in bar"
+    },
+    "user": {
+      "label": "User"
+    }
+  },
+  "widget": {
+    "not_configured": "Configure a remote Hermes host"
+  }
+}

@@ -1,43 +1,44 @@
 # Noctalia Custom Plugins
 
-Custom plugins for [Noctalia Shell](https://github.com/noctalia-dev).
+Custom plugins for [Noctalia Shell 5](https://github.com/noctalia-dev/noctalia).
 
 ## Plugins
 
 | Plugin | Description |
 |---|---|
-| [hermes-agent](hermes-agent/) | Native Noctalia status, chat panel, and launcher for Hermes Agent. Supports client-only mode (remote bridge over SSH). Fork of [nomadx's PR #934](https://github.com/noctalia-dev/legacy-v4-plugins/pull/934). |
-| [hermes-ssh-chat](hermes-ssh-chat/) | Use Hermes on a remote server through an interactive SSH terminal. |
 | [ai-usage-panel](ai-usage-panel/) | Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the bar. Port of gustavobragac's plasma-ai-usage-panel. |
+| [hermes-agent](hermes-agent/) | Native Noctalia status, chat panel, and launcher for Hermes Agent. Supports client-only mode through a remote bridge over SSH. Fork of [nomadx's plugin](https://github.com/noctalia-dev/legacy-v4-plugins/pull/934). |
+| [hermes-ssh-chat](hermes-ssh-chat/) | Launch Hermes on a remote server in an interactive SSH terminal. |
 
-## Installation
+## Noctalia 5 installation
 
-### From the Noctalia UI (recommended)
+### Settings UI
 
-Noctalia can install plugins straight from this repository — no manual copying.
+1. Open **Settings → Plugins**.
+2. Add a **git** source with this location:
 
-1. Open **Settings -> Plugins -> Sources**.
-2. Click **Add source** and paste this repository URL:
-
-   ```
+   ```text
    https://github.com/FelipeMayerDev/noctalia-custom-plugins
    ```
 
-3. Make sure the source is **enabled**.
-4. Go to the **Available** tab and hit **Refresh** if the list is stale.
-5. Find the plugin (e.g. *Hermes SSH Terminal*), click **Install**, then
-   toggle it **on** in the **Installed** tab.
+3. Update the source, then enable the desired plugin.
+4. Add its widget from the bar editor. Plugin panels and launcher providers become available when the plugin is enabled.
 
-> Noctalia reads `registry.json` from the default branch of each source repo to
-> list available plugins, then clones the matching plugin folder on install.
+Noctalia 5 discovers each top-level `plugin.toml`; `registry.json` and the QML `manifest.json` files are only retained for legacy Noctalia 4 installations.
 
-### Manual install
-
-Copy the plugin folder into your Noctalia plugins directory, then enable it in
-**Settings -> Plugins -> Installed**:
+### Command line
 
 ```bash
-cp -r hermes-ssh-chat ~/.config/noctalia/plugins/
+noctalia msg plugins source add custom git https://github.com/FelipeMayerDev/noctalia-custom-plugins
+noctalia msg plugins enable felipemayerdev/ai-usage-panel
+noctalia msg plugins enable felipemayerdev/hermes-agent
+noctalia msg plugins enable felipemayerdev/hermes-ssh-chat
 ```
 
-Each plugin has its own `README.md` with setup and usage details.
+For local development, add the checkout as a path source:
+
+```bash
+noctalia msg plugins source add custom-dev path "$PWD"
+```
+
+Each plugin README documents its entries, dependencies, settings, and direct panel command.

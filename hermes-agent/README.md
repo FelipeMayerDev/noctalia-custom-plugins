@@ -1,120 +1,93 @@
 # Hermes Agent
 
-Native Noctalia plugin for [Hermes Agent](https://github.com/noctalia-dev/legacy-v4-plugins).
+Noctalia 5 status, chat panel, and launcher integration for [Hermes Agent](https://github.com/NousResearch/hermes-agent).
 
-Shows live Hermes status in the bar, provides a full chat panel with streaming responses, tool-event activity, approval prompts, interrupt, one-shot prompts, and a launcher provider using `>hermes`.
+| Plugin | Value |
+|---|---|
+| ID | `felipemayerdev/hermes-agent` |
+| Bar widget | `status` |
+| Panel | `chat-panel` |
+| Launcher provider | `hermes` |
+| Service | `bridge` |
 
-## Features
+## Usage
 
-- **Bar widget**: traffic-light status indicator (online / busy / needs you / degraded / offline) with click-to-expand summary popup.
-- **Panel**: persistent chat with Hermes — send prompts, watch streaming responses, approve tool calls, interrupt, start / resume sessions.
-- **Launcher provider**: type `>hermes` in the Noctalia launcher to open the panel, start a session, resume the latest session, or send a one-shot prompt.
-- **Settings UI**: configure bridge host / port, state file, Hermes home, poll interval, default provider / model, auto-start bridge, hide-when-idle, pin panel, show tool activity.
+1. Enable `felipemayerdev/hermes-agent`.
+2. Add **Hermes Agent → status** to the bar.
+3. Click the widget to open chat; right-click it to open plugin settings.
+4. Type `/hermes` in the launcher to open chat, create or resume a session, or add a prompt for a one-shot request.
+5. Open the panel directly when needed:
+
+   ```bash
+   noctalia msg panel-toggle felipemayerdev/hermes-agent:chat-panel
+   ```
+
+The chat panel follows streaming bridge state, sends prompts, interrupts active work, creates sessions, and answers tool-approval requests. Type a prompt and press Enter or click **Send**.
 
 ## Requirements
 
-- [Hermes Agent](https://github.com/noctalia-dev/legacy-v4-plugins) installed and on `PATH` (or set `hermesCommand` in settings).
-- Noctalia 4.4.1 or newer.
+- `python3`
+- `hermes`
+- `pkill` from procps, used only to stop a local bridge started by the plugin
+- Noctalia 5 with plugin API 8 or newer
 
-## How it works
+The plugin ships `scripts/hermes_bridge.py`. In local mode the service starts it when the configured bridge is unavailable, polls its authenticated HTTP API, and starts the Hermes gateway when requested by settings.
 
-The plugin ships a small Python bridge (`scripts/hermes_bridge.py`) that exposes local HTTP endpoints for health, state, session, prompt, interrupt, approvals, and one-shot commands. The QML surfaces talk to the bridge and render state from a watched state file.
+## Remote client-only mode
 
-## Client-only mode (remote Hermes over SSH)
-
-When Hermes runs on a **remote server**, the client machine has no bridge script,
-no `~/.hermes`, and no token file — so the default local mode does not work.
-Client-only mode keeps every feature (status, chat, approvals, sessions,
-launcher) but drives a bridge running on the server, reached over an SSH tunnel.
-
-The bridge binds to `127.0.0.1` on the server (no exposed port, token never
-travels in plaintext); the SSH tunnel forwards it to the client.
-
-**On the server** (where Hermes lives):
+Run the bridge on the server that has Hermes:
 
 ```bash
 cd <plugin-dir>/scripts
 ./hermes-bridge-serve.sh 19777
 ```
 
-It starts the bridge and prints the **bridge token**. Copy it.
-
-**On the client**, open the tunnel:
+Copy the printed bridge token, then create a local tunnel:
 
 ```bash
-ssh -L 19777:127.0.0.1:19777 <user>@<server>
+ssh -L 19777:127.0.0.1:19777 user@server
 ```
 
-**In the plugin settings** (Advanced):
+In plugin settings:
 
-1. Enable **Client-only mode (remote bridge)**.
-2. Set **Bridge host** = `127.0.0.1`, **Bridge port** = `19777` (the forwarded port).
-3. Paste the **Bridge token** from the server helper.
+1. Enable **Client-only mode**.
+2. Set **Bridge host** to `127.0.0.1` and **Bridge port** to `19777`.
+3. Paste the bridge token.
 
-In this mode the plugin never spawns a local bridge; it polls `/state` over HTTP
-(fast while a session is running, slower when idle). Gateway controls, model
-selection, sessions, approvals, and the `>hermes` launcher all operate against
-the remote bridge.
+Client-only mode never starts a local bridge. Status, chat, approvals, sessions, launcher actions, and gateway controls target the forwarded remote bridge.
 
-### Troubleshooting
-
-**`bind [127.0.0.1]:19777: Address already in use` when opening the tunnel.**
-Something already holds the port on the client — usually a local bridge spawned
-by the plugin *before* client-only mode was enabled, or a previous tunnel still
-open. Find and stop it, then re-open the tunnel:
+Verify the tunnel independently:
 
 ```bash
-ss -ltnp | grep 19777                 # see what holds the port
-pkill -f hermes_bridge.py             # kill a stray local bridge (safe in client-only mode)
+curl -s 127.0.0.1:19777/health
+curl -s -H 'X-Bridge-Token: <token>' 127.0.0.1:19777/state
 ```
-
-Enabling client-only mode now tears down any local bridge automatically, so this
-only bites when upgrading from an older setup. Tip: if the port is taken, the
-tunnel may bind only IPv6 (`::1`) and the plugin (which calls `127.0.0.1`, IPv4)
-won't reach it — always free the port first.
-
-**Bar pill is grey / "unknown" even though the tunnel works.** The bridge reports
-`hermes.status: "unknown"` until a session runs or a status hook fires. The pill
-falls back to the gateway: if the gateway is **running** it shows **idle**; if it
-stays unknown, the Hermes gateway is not running on the server (start it, or let
-`autoStartGateway` do it).
-
-**Verify the tunnel independently** of the plugin:
-
-```bash
-curl -s 127.0.0.1:19777/health                              # -> {"bridge": {"status": "online"}}
-curl -s -H "X-Bridge-Token: <token>" 127.0.0.1:19777/state  # -> full state JSON
-```
-
-If `/health` works but the plugin still looks disconnected, reload Noctalia so it
-re-polls with the tunnel up.
 
 ## Settings
 
 | Setting | Default | Description |
-|---|---|---|
-| `bridgeHost` | `127.0.0.1` | Bridge host |
-| `bridgePort` | `19777` | Bridge port |
-| `stateFile` | `~/.cache/noctalia-hermes/state.json` | Shared state file |
-| `hermesHome` | `~/.hermes` | Hermes home directory |
-| `hermesCommand` | `hermes` | Hermes executable |
-| `autoStartBridge` | `true` | Start the bridge when Noctalia loads (local mode) |
-| `clientOnlyMode` | `false` | Connect to a remote bridge over SSH instead of starting one locally |
-| `bridgeTokenManual` | _(empty)_ | Bridge token (required in client-only mode) |
-| `statusPollIntervalSec` | `30` | Status poll interval |
-| `hideWhenIdle` | `false` | Hide the bar pill when idle |
-| `launcherPrefix` | `>hermes` | Launcher command prefix |
-| `panelPinned` | `false` | Pin the panel as a persistent side window |
-| `showToolActivity` | `false` | Show compact tool-activity line |
-| `defaultProvider` | _(empty)_ | Default provider |
-| `defaultModel` | _(empty)_ | Default model |
+|---|---:|---|
+| Bridge host | `127.0.0.1` | Local bridge or forwarded address. |
+| Bridge port | `19777` | HTTP bridge port. |
+| State file | `~/.cache/noctalia-hermes/state.json` | Local bridge state and token directory. |
+| Hermes home | `~/.hermes` | Home passed to the bridge. |
+| Hermes command | `hermes` | Executable used by the bridge. |
+| Auto-start bridge | On | Starts the bundled bridge in local mode. |
+| Auto-start gateway | On | Starts a stopped Hermes gateway. |
+| Client-only mode | Off | Uses an existing bridge instead of a local process. |
+| Bridge token | Empty | Required by a remote bridge. |
+| Status poll interval | 30 seconds | Idle polling cadence; active sessions poll every two seconds. |
+| Hide when idle | Off | Hides an online idle bar widget. |
+| Show tool activity | Off | Keeps the compact activity line visible while idle. |
+
+## Network, files, and processes
+
+The service starts the bundled Python bridge only in local mode and stops that process when its runtime exits. It reads the bridge token beside the configured state file and sends authenticated HTTP requests to the configured bridge host. The bridge owns Hermes state files, gateway processes, sessions, and provider network access.
 
 ## Credits
 
-Original `hermes-agent` plugin by **nomadx**
-([PR #934](https://github.com/noctalia-dev/legacy-v4-plugins/pull/934)).
-Client-only mode (remote bridge over SSH) added in this fork by FelipeMayerDev.
+Original `hermes-agent` plugin by **nomadx** ([legacy PR #934](https://github.com/noctalia-dev/legacy-v4-plugins/pull/934)). Client-only mode and the Noctalia 5 port are maintained in this fork by FelipeMayerDev.
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).

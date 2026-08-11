@@ -1,0 +1,93 @@
+{
+  "bar": {
+    "refresh": "Refresh"
+  },
+  "bubble": {
+    "hermes": "Hermes",
+    "you": "You"
+  },
+  "launcher": {
+    "ask": "Ask Hermes",
+    "newSession": "Start Hermes session",
+    "newSessionDescription": "Create a new Hermes RPC session",
+    "openPanel": "Open Hermes panel",
+    "openPanelDescription": "Show the Hermes chat panel",
+    "resumeLatest": "Resume latest Hermes session",
+    "resumeLatestDescription": "Resume the stored session when available",
+    "typePrompt": "Type a prompt for Hermes"
+  },
+  "panel": {
+    "approvalRequired": "Approval required",
+    "approve": "Allow",
+    "approveSession": "Allow Session",
+    "backgroundActions": "background actions",
+    "backgroundRunning": "background action running",
+    "bridgeOffline": "Bridge offline",
+    "close": "Close",
+    "deny": "Deny",
+    "interrupt": "Interrupt",
+    "lastAction": "last",
+    "newSession": "New Session",
+    "noModel": "No model selected",
+    "noSession": "No active session",
+    "placeholder": "Ask Hermes…",
+    "send": "Send",
+    "title": "Hermes"
+  },
+  "settings": {
+    "auto_start_bridge": {
+      "description": "Start the local Python bridge when it is unavailable.",
+      "label": "Auto-start bridge"
+    },
+    "auto_start_gateway": {
+      "description": "Start the Hermes gateway when the bridge reports it stopped.",
+      "label": "Auto-start gateway"
+    },
+    "bridge_host": {
+      "description": "Host exposed by the local bridge or SSH port forward.",
+      "label": "Bridge host"
+    },
+    "bridge_port": {
+      "label": "Bridge port"
+    },
+    "bridge_token": {
+      "description": "Token printed by the remote hermes-bridge-serve helper.",
+      "label": "Bridge token"
+    },
+    "client_only_mode": {
+      "description": "Connect to an existing remote bridge instead of starting a local process.",
+      "label": "Client-only mode"
+    },
+    "hermes_command": {
+      "label": "Hermes command"
+    },
+    "hermes_home": {
+      "label": "Hermes home"
+    },
+    "hide_when_idle": {
+      "description": "Hide the bar widget while Hermes is online and idle.",
+      "label": "Hide when idle"
+    },
+    "poll_interval": {
+      "description": "Seconds between idle bridge polls. Active sessions poll every two seconds.",
+      "label": "Status poll interval"
+    },
+    "show_tool_activity": {
+      "description": "Keep tool-call activity visible when the session is not busy.",
+      "label": "Show tool activity"
+    },
+    "state_file": {
+      "description": "State JSON written by the local Hermes bridge.",
+      "label": "State file"
+    }
+  },
+  "status": {
+    "attention": "Needs You",
+    "busy": "Working",
+    "degraded": "Degraded",
+    "error": "Error",
+    "idle": "Online",
+    "offline": "Offline",
+    "unknown": "Unknown"
+  }
+}

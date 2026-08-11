@@ -1,0 +1,35 @@
+{
+  "panel": {
+    "close": "Close",
+    "no_providers": "Enable at least one provider in plugin settings.",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing",
+    "title": "AI Usage"
+  },
+  "settings": {
+    "enabled_providers": {
+      "description": "Provider IDs to query: claude, codex, copilot, zen, and zai.",
+      "label": "Enabled providers"
+    },
+    "icon_only": {
+      "description": "Show only the chart glyph in the bar.",
+      "label": "Icon only"
+    },
+    "refresh_interval": {
+      "description": "Seconds between automatic usage refreshes.",
+      "label": "Refresh interval"
+    },
+    "refresh_on_open": {
+      "description": "Refresh data when the panel opens, limited to once every 10 seconds.",
+      "label": "Refresh on open"
+    },
+    "show_reset_time": {
+      "description": "Keep reset timing in compact bar labels when the helper provides it.",
+      "label": "Show reset time"
+    },
+    "zai_token": {
+      "description": "Saved to ~/.config/plasma-ai-usage-panel/zai.conf for zai-usage compatibility.",
+      "label": "Z.ai API key"
+    }
+  }
+}

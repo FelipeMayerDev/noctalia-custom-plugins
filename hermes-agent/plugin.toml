@@ -1,0 +1,123 @@
+id = "felipemayerdev/hermes-agent"
+name = "Hermes Agent"
+version = "2.0.0"
+plugin_api = 8
+author = "nomadx"
+license = "MIT"
+description = "Noctalia status, chat panel, and launcher integration for Hermes Agent."
+dependencies = ["python3", "hermes", "pkill"]
+tags = ["ai", "bar", "launcher", "panel", "service"]
+icon = "sparkles"
+
+[[setting]]
+key = "bridge_host"
+type = "string"
+label_key = "settings.bridge_host.label"
+description_key = "settings.bridge_host.description"
+default = "127.0.0.1"
+
+[[setting]]
+key = "bridge_port"
+type = "int"
+label_key = "settings.bridge_port.label"
+default = 19777
+min = 1
+max = 65535
+
+[[setting]]
+key = "state_file"
+type = "string"
+label_key = "settings.state_file.label"
+description_key = "settings.state_file.description"
+default = "~/.cache/noctalia-hermes/state.json"
+advanced = true
+
+[[setting]]
+key = "hermes_home"
+type = "string"
+label_key = "settings.hermes_home.label"
+default = "~/.hermes"
+advanced = true
+
+[[setting]]
+key = "hermes_command"
+type = "string"
+label_key = "settings.hermes_command.label"
+default = "hermes"
+advanced = true
+
+[[setting]]
+key = "auto_start_bridge"
+type = "bool"
+label_key = "settings.auto_start_bridge.label"
+description_key = "settings.auto_start_bridge.description"
+default = true
+
+[[setting]]
+key = "auto_start_gateway"
+type = "bool"
+label_key = "settings.auto_start_gateway.label"
+description_key = "settings.auto_start_gateway.description"
+default = true
+
+[[setting]]
+key = "client_only_mode"
+type = "bool"
+label_key = "settings.client_only_mode.label"
+description_key = "settings.client_only_mode.description"
+default = false
+
+[[setting]]
+key = "bridge_token"
+type = "string"
+label_key = "settings.bridge_token.label"
+description_key = "settings.bridge_token.description"
+default = ""
+visible_when = { key = "client_only_mode", values = ["true"] }
+
+[[setting]]
+key = "status_poll_interval_sec"
+type = "int"
+label_key = "settings.poll_interval.label"
+description_key = "settings.poll_interval.description"
+default = 30
+min = 2
+max = 300
+
+[[setting]]
+key = "hide_when_idle"
+type = "bool"
+label_key = "settings.hide_when_idle.label"
+description_key = "settings.hide_when_idle.description"
+default = false
+
+[[setting]]
+key = "show_tool_activity"
+type = "bool"
+label_key = "settings.show_tool_activity.label"
+description_key = "settings.show_tool_activity.description"
+default = false
+
+[[widget]]
+id = "status"
+entry = "widget.luau"
+
+[[panel]]
+id = "chat-panel"
+entry = "panel.luau"
+width = 780
+height = "fill"
+placement = "floating"
+position = "center_right"
+dismiss_on_outside_click = false
+
+[[launcher_provider]]
+id = "hermes"
+entry = "launcher.luau"
+prefix = "hermes"
+glyph = "sparkles"
+include_in_global_search = false
+
+[[service]]
+id = "bridge"
+entry = "service.luau"
