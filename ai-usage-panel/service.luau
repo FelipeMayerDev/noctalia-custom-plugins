@@ -149,10 +149,11 @@ local function timestampSeconds(value)
   return result
 end
 
-local function window(periodSeconds, periodKey, percentage, resetsAt)
+local function window(periodSeconds, periodKey, percentage, resetsAt, label)
   return {
     period_seconds = tonumber(periodSeconds),
     period_key = periodKey,
+    label = label,
     percentage = pct(percentage),
     resets_at = timestampSeconds(resetsAt),
   }
@@ -224,6 +225,14 @@ local function collectClaude(requestGeneration)
       window(5 * 60 * 60, nil, fiveHour.utilization, fiveHour.resets_at),
       window(7 * 24 * 60 * 60, nil, sevenDay.utilization, sevenDay.resets_at),
     }
+    for _, limit in ipairs(payload.limits or {}) do
+      local scope = type(limit.scope) == "table" and limit.scope or {}
+      local model = type(scope.model) == "table" and scope.model or {}
+      local name = type(model.display_name) == "string" and model.display_name or ""
+      if name ~= "" then
+        table.insert(windows, window(nil, nil, limit.percent, limit.resets_at, name))
+      end
+    end
     local plan = type(oauth.subscriptionType) == "string" and oauth.subscriptionType or ""
     finish(requestGeneration, "claude", normalizeWindowResult(windows, plan), nil)
   end)

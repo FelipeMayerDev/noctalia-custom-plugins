@@ -40,6 +40,8 @@ Provider cards use compact single-line quota rows. Plan/account metadata stays i
 | `zen` | Uses the upstream browser-cookie collector. | `zen-balance` |
 | `zai` | Uses the API key stored in Noctalia plugin settings and requests `api.z.ai` directly. | None |
 
+Model-scoped weekly limits (for example Fable 5's dedicated weekly allowance) are read from the same usage response and shown as an extra row labeled with the model's display name. The bar's Claude percentage reflects the most-used window, including scoped ones.
+
 Claude and Codex are enabled by default and no longer require `claude-usage`, `codex-usage`, Python, `uv`, or `curl_cffi`. Open the corresponding CLI once if an OAuth token is missing or expired. Copilot requires a GitHub token allowed to read the account's premium-request usage; GitHub may return 404 when the account or token does not expose that endpoint.
 
 Install the optional OpenCode Zen collector from the upstream project:
