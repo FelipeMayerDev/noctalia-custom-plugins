@@ -4,7 +4,7 @@
     {
       "id": "ai-usage-panel",
       "name": "AI Usage Panel",
-      "version": "1.6.0",
+      "version": "1.6.1",
       "official": false,
       "author": "FelipeMayerDev",
       "description": "Monitor Claude, Codex, Copilot, OpenCode Zen, and Z.ai usage from the Noctalia bar. Noctalia port of gustavobragac's plasma-ai-usage-panel.",
@@ -15,7 +15,7 @@
         "Panel",
         "AI"
       ],
-      "lastUpdated": "2026-08-14T12:00:00-03:00"
+      "lastUpdated": "2026-08-16T18:32:24Z"
     },
     {
       "id": "hermes-agent",

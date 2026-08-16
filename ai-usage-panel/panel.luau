@@ -93,18 +93,19 @@ end
 local function quotaWindowNode(item, index)
   local percentage = math.clamp(tonumber(item.percentage) or 0, 0, 100)
   local children = {
-    ui.label({ text = periodLabel(item), fontSize = 11, maxWidth = 64 }),
-    ui.progress({ progress = percentage / 100, width = 108, height = 5, radius = 3 }),
-    ui.label({ text = string.format("%.0f%%", percentage), fontSize = 11, fontWeight = "bold", maxWidth = 36 }),
+    ui.label({ text = periodLabel(item), fontSize = 11, width = 64 }),
+    ui.progress({ progress = percentage / 100, flexGrow = 1, height = 5, radius = 3 }),
+    ui.label({ text = string.format("%.0f%%", percentage), fontSize = 11, fontWeight = "bold", width = 32, textAlign = "end" }),
   }
   local reset = formatRemaining(item.resets_at)
   if noctalia.getConfig("show_reset_time") ~= false and reset ~= "" then
-    table.insert(children, ui.spacer({ flexGrow = 1 }))
     table.insert(children, ui.label({
       text = reset,
       fontSize = 10,
       color = "on_surface_variant",
       maxLines = 1,
+      width = 48,
+      textAlign = "end",
     }))
   end
   return ui.row({ key = `window={index}`, gap = 6, align = "center" }, children)
@@ -225,7 +226,7 @@ local function providerCard(provider, data)
     paddingV = 7,
     gap = 5,
     fill = "surface_variant/0.45",
-    radius = 8,
+    radius = 0,
     border = "outline",
     borderWidth = 1,
   }, content)
@@ -243,7 +244,7 @@ local function render()
     table.insert(cards, ui.column({
       padding = 12,
       fill = "surface_variant/0.45",
-      radius = 8,
+      radius = 0,
     }, {
       ui.label({ text = tr("panel.no_providers"), fontSize = 11, textAlign = "center", maxLines = 2 }),
     }))
