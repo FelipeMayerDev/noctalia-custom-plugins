@@ -92,23 +92,24 @@ end
 
 local function quotaWindowNode(item, index)
   local percentage = math.clamp(tonumber(item.percentage) or 0, 0, 100)
-  local children = {
-    ui.label({ text = periodLabel(item), fontSize = 11, width = 64 }),
-    ui.progress({ progress = percentage / 100, flexGrow = 1, height = 5, radius = 3 }),
-    ui.label({ text = string.format("%.0f%%", percentage), fontSize = 11, fontWeight = "bold", width = 32, textAlign = "end" }),
+  local topChildren = {
+    ui.label({ text = periodLabel(item), fontSize = 11 }),
+    ui.spacer({ flexGrow = 1 }),
+    ui.label({ text = string.format("%.0f%%", percentage), fontSize = 11, fontWeight = "bold" }),
   }
   local reset = formatRemaining(item.resets_at)
   if noctalia.getConfig("show_reset_time") ~= false and reset ~= "" then
-    table.insert(children, ui.label({
+    table.insert(topChildren, ui.label({
       text = reset,
       fontSize = 10,
       color = "on_surface_variant",
       maxLines = 1,
-      width = 48,
-      textAlign = "end",
     }))
   end
-  return ui.row({ key = `window={index}`, gap = 6, align = "center" }, children)
+  return ui.column({ key = `window={index}`, gap = 3 }, {
+    ui.row({ gap = 6, align = "center" }, topChildren),
+    ui.progress({ progress = percentage / 100, flexGrow = 1, height = 5, radius = 3 }),
+  })
 end
 local function appendCodexResetControls(content, data)
   local resetCredits = type(data) == "table" and data.reset_credits or nil
