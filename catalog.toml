@@ -4,8 +4,8 @@
 [[plugin]]
 id = "felipemayerdev/ai-usage-panel"
 name = "AI Usage Panel"
-version = "1.6.3"
-updated_at = 1786974199
+version = "1.6.4"
+updated_at = 1786975161
 added_at = 1786415333
 author = "FelipeMayerDev"
 license = "MIT"
