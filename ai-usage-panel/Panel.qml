@@ -9,7 +9,7 @@ Item {
   id: root
 
   property var pluginApi
-  property real contentPreferredWidth: Math.round(420 * Style.uiScaleRatio)
+  property real contentPreferredWidth: Math.round((340 + 90 * Local.AiUsageService.providers().length) * Style.uiScaleRatio)
   property real contentPreferredHeight: mainColumn.implicitHeight + Style.margin2L
   property bool allowAttach: true
 
@@ -92,6 +92,8 @@ Item {
               pointSize: Style.fontSizeS
               family: Settings.data.ui.fontFixed
               color: Color.mOnSurfaceVariant
+              elide: Text.ElideRight
+              Layout.fillWidth: true
             }
           }
 
@@ -101,10 +103,15 @@ Item {
             pointSize: Style.fontSizeS
             family: Settings.data.ui.fontFixed
             color: Color.mOnSurface
-            wrapMode: Text.WordWrap
+            wrapMode: Text.WrapAnywhere
           }
         }
       }
+    }
+    // ponytail: spacer fixo — o host não honra margem via contentPreferredHeight
+    Item {
+      Layout.fillWidth: true
+      implicitHeight: Style.margin2L
     }
   }
 }
