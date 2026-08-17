@@ -15,6 +15,11 @@ local codexResetInFlight = noctalia.state.get("codex_reset_in_flight") == true
 local codexResetError = tostring(noctalia.state.get("codex_reset_error") or "")
 local confirmingCodexReset = false
 
+local expanded = {}
+local history = noctalia.state.get("usage_history") or {}
+local HISTORY_PROVIDERS = { claude = true, codex = true }
+local render
+
 local function tr(key)
   return noctalia.tr(key)
 end
@@ -177,6 +182,70 @@ local function appendCodexResetControls(content, data)
 end
 
 
+local function fmtTokens(n)
+  n = tonumber(n) or 0
+  if n >= 1e9 then return string.format("%.1fB", n / 1e9) end
+  if n >= 1e6 then return string.format("%.1fM", n / 1e6) end
+  if n >= 1e3 then return string.format("%.1fk", n / 1e3) end
+  return tostring(math.floor(n))
+end
+
+local function shortModel(name)
+  return (tostring(name or ""):gsub("%-%d%d%d%d%d%d%d%d$", ""))
+end
+
+local function weeklyBreakdown(provider)
+  local h = history[provider.id]
+  if type(h) ~= "table" or type(h.models) ~= "table" or #h.models == 0 then
+    return { ui.label({ text = tr("panel.no_history"), fontSize = 10, color = "on_surface_variant", maxLines = 2 }) }
+  end
+  local maxv = math.max(1, tonumber(h.max) or 1)
+  local nodes = {
+    ui.label({
+      text = string.format(tr("panel.most_used"), shortModel(h.most_used)),
+      fontSize = 10,
+      fontWeight = "bold",
+      color = provider.color,
+      maxLines = 1,
+    }),
+  }
+  for _, m in ipairs(h.models) do
+    local isTop = m.name == h.most_used
+    table.insert(nodes, ui.row({ gap = 6, align = "center" }, {
+      ui.label({
+        text = shortModel(m.name),
+        fontSize = 10,
+        fontWeight = isTop and "bold" or nil,
+        color = isTop and provider.color or "on_surface",
+        maxLines = 1,
+      }),
+      ui.spacer({ flexGrow = 1 }),
+      ui.label({ text = fmtTokens(m.total), fontSize = 9, color = "on_surface_variant" }),
+    }))
+    local bars = {}
+    local per = m.per_day or {}
+    for i = 1, 7 do
+      local v = tonumber(per[i]) or 0
+      local barH = v > 0 and math.max(3, math.floor(v / maxv * 22)) or 2
+      table.insert(bars, ui.column({
+        minWidth = 12,
+        minHeight = barH,
+        radius = 2,
+        fill = v > 0 and (isTop and provider.color or "on_surface_variant/0.6") or "on_surface_variant/0.18",
+      }, {}))
+    end
+    table.insert(nodes, ui.row({ gap = 4, align = "end" }, bars))
+  end
+  local dayLabels = {}
+  for _, lbl in ipairs(h.labels or {}) do
+    table.insert(dayLabels, ui.column({ minWidth = 12 }, {
+      ui.label({ text = tostring(lbl), fontSize = 8, color = "on_surface_variant", textAlign = "center" }),
+    }))
+  end
+  table.insert(nodes, ui.row({ gap = 4 }, dayLabels))
+  return nodes
+end
+
 local function providerCard(provider, data)
   local headerValue = "…"
   if type(data) == "table" then
@@ -191,6 +260,13 @@ local function providerCard(provider, data)
   end
   table.insert(header, ui.spacer({ flexGrow = 1 }))
   table.insert(header, ui.label({ text = headerValue, fontSize = 13, fontWeight = "bold", color = provider.color }))
+  if HISTORY_PROVIDERS[provider.id] then
+    table.insert(header, ui.glyph({
+      name = expanded[provider.id] and "chevron-up" or "chevron-down",
+      size = 14,
+      color = "on_surface_variant",
+    }))
+  end
 
   local content = {
     ui.row({ gap = 6, align = "center" }, header),
@@ -221,6 +297,13 @@ local function providerCard(provider, data)
     end
   end
 
+  if HISTORY_PROVIDERS[provider.id] and expanded[provider.id] then
+    table.insert(content, ui.separator({}))
+    for _, node in ipairs(weeklyBreakdown(provider)) do
+      table.insert(content, node)
+    end
+  end
+
   return ui.column({
     key = "provider=" .. provider.id,
     paddingH = 10,
@@ -230,10 +313,14 @@ local function providerCard(provider, data)
     radius = 0,
     border = "outline",
     borderWidth = 1,
+    onClick = HISTORY_PROVIDERS[provider.id] and function()
+      expanded[provider.id] = not expanded[provider.id]
+      render()
+    end or nil,
   }, content)
 end
 
-local function render()
+function render()
   local cards = {}
   for _, id in ipairs(configuredIds()) do
     local provider = providerFor(id)
@@ -333,6 +420,11 @@ end)
 
 noctalia.state.watch("usage_last_refresh", function(value)
   lastRefresh = tonumber(value)
+  render()
+end)
+
+noctalia.state.watch("usage_history", function(value)
+  history = type(value) == "table" and value or {}
   render()
 end)
 

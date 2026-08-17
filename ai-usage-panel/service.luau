@@ -465,6 +465,155 @@ local function collect(requestGeneration, id)
   end
 end
 
+-- ponytail: weekly per-model token history from local CLI logs (Claude/Codex only).
+-- Aggregated by an embedded python3 helper (heredoc) so parsing stays out of the
+-- Luau CPU budget; mtime-filtered to the 7-day window to bound the scan.
+local HISTORY_PY = [==[
+import json, os, glob
+from datetime import datetime, timedelta, time as dtime
+
+WANT_CLAUDE = os.environ.get("WANT_CLAUDE") == "True"
+WANT_CODEX = os.environ.get("WANT_CODEX") == "True"
+TOP_N = 6
+
+today = datetime.now().date()
+days = [today - timedelta(days=i) for i in range(6, -1, -1)]
+daykeys = [d.isoformat() for d in days]
+labels = [d.strftime("%a") for d in days]
+index = {k: i for i, k in enumerate(daykeys)}
+start_epoch = datetime.combine(days[0], dtime.min).timestamp()
+
+
+def date_index(ts):
+    if not isinstance(ts, str):
+        return None
+    s = ts.strip()
+    try:
+        dt = datetime.fromisoformat(s[:-1] + "+00:00") if s.endswith("Z") else datetime.fromisoformat(s)
+    except ValueError:
+        return None
+    if dt.tzinfo is not None:
+        dt = dt.astimezone()
+    return index.get(dt.date().isoformat())
+
+
+def pack(agg):
+    models = []
+    grand = 0
+    maxv = 0
+    for name, per in agg.items():
+        total = sum(per)
+        if total <= 0:
+            continue
+        grand += total
+        maxv = max(maxv, max(per))
+        models.append({"name": name, "total": total, "per_day": per})
+    models.sort(key=lambda m: m["total"], reverse=True)
+    most = models[0]["name"] if models else ""
+    return {"labels": labels, "dates": daykeys, "models": models[:TOP_N],
+            "most_used": most, "max": maxv, "total": grand}
+
+
+def collect_claude():
+    agg = {}
+    for f in glob.glob(os.path.expanduser("~/.claude/projects") + "/**/*.jsonl", recursive=True):
+        try:
+            if os.path.getmtime(f) < start_epoch:
+                continue
+        except OSError:
+            continue
+        with open(f, errors="ignore") as fh:
+            for line in fh:
+                if '"usage"' not in line:
+                    continue
+                try:
+                    o = json.loads(line)
+                except ValueError:
+                    continue
+                if o.get("type") != "assistant":
+                    continue
+                msg = o.get("message") or {}
+                model = msg.get("model")
+                if not model:
+                    continue
+                u = msg.get("usage") or {}
+                tok = ((u.get("input_tokens") or 0) + (u.get("output_tokens") or 0)
+                       + (u.get("cache_read_input_tokens") or 0) + (u.get("cache_creation_input_tokens") or 0))
+                if tok <= 0:
+                    continue
+                di = date_index(o.get("timestamp"))
+                if di is None:
+                    continue
+                agg.setdefault(model, [0] * 7)[di] += tok
+    return pack(agg)
+
+
+def collect_codex():
+    agg = {}
+    for f in glob.glob(os.path.expanduser("~/.codex/sessions") + "/**/rollout-*.jsonl", recursive=True):
+        try:
+            if os.path.getmtime(f) < start_epoch:
+                continue
+        except OSError:
+            continue
+        model = None
+        with open(f, errors="ignore") as fh:
+            for line in fh:
+                try:
+                    o = json.loads(line)
+                except ValueError:
+                    continue
+                t = o.get("type")
+                p = o.get("payload") or {}
+                if t == "turn_context":
+                    m = p.get("model")
+                    if isinstance(m, str) and m:
+                        model = m
+                elif t == "event_msg" and p.get("type") == "token_count":
+                    last = (p.get("info") or {}).get("last_token_usage") or {}
+                    tok = ((last.get("input_tokens") or 0) + (last.get("output_tokens") or 0)
+                           + (last.get("cached_input_tokens") or 0) + (last.get("cache_write_input_tokens") or 0)
+                           + (last.get("reasoning_output_tokens") or 0))
+                    if tok <= 0:
+                        continue
+                    di = date_index(o.get("timestamp"))
+                    if di is None:
+                        continue
+                    agg.setdefault(model or "codex", [0] * 7)[di] += tok
+    return pack(agg)
+
+
+out = {}
+if WANT_CLAUDE:
+    out["claude"] = collect_claude()
+if WANT_CODEX:
+    out["codex"] = collect_codex()
+print(json.dumps(out, separators=(",", ":")))
+]==]
+
+local function collectHistory()
+  local ids = {}
+  for _, id in ipairs(configuredProviderIds()) do
+    ids[id] = true
+  end
+  if (not ids.claude and not ids.codex) or not noctalia.commandExists("python3") then
+    noctalia.state.set("usage_history", {})
+    return
+  end
+  local cmd = "WANT_CLAUDE=" .. (ids.claude and "True" or "False")
+    .. " WANT_CODEX=" .. (ids.codex and "True" or "False")
+    .. " python3 - <<'NOCTALIA_USAGE_PY'\n" .. HISTORY_PY .. "\nNOCTALIA_USAGE_PY\n"
+  noctalia.runAsync(cmd, function(result)
+    if type(result) ~= "table" or result.exitCode ~= 0 then
+      return
+    end
+    local decoded = noctalia.json.decode(result.stdout or "")
+    if type(decoded) == "table" then
+      noctalia.state.set("usage_history", decoded)
+    end
+  end, 15000)
+end
+
 local function refreshAll()
   if refreshing then
     return
@@ -482,6 +631,7 @@ local function refreshAll()
   for _, id in ipairs(ids) do
     collect(requestGeneration, id)
   end
+  collectHistory()
 end
 
 local codexResetInFlight = false

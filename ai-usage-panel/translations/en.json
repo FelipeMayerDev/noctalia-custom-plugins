@@ -21,7 +21,10 @@
     "reset_confirmation": "Consume one saved reset and reset Codex rate limits now? This cannot be undone.",
     "cancel": "Cancel",
     "confirm_reset": "Confirm reset",
-    "no_providers": "Enable at least one provider in plugin settings."
+    "no_providers": "Enable at least one provider in plugin settings.",
+    "no_history": "No local usage history found for the last 7 days.",
+    "most_used": "Most used: %s",
+    "weekly_usage": "Last 7 days by model"
   },
   "period": {
     "minute": "%d minute",
