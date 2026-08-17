@@ -15,7 +15,6 @@ local codexResetInFlight = noctalia.state.get("codex_reset_in_flight") == true
 local codexResetError = tostring(noctalia.state.get("codex_reset_error") or "")
 local confirmingCodexReset = false
 
-local expanded = {}
 local history = noctalia.state.get("usage_history") or {}
 local HISTORY_PROVIDERS = { claude = true, codex = true }
 local render
@@ -260,13 +259,6 @@ local function providerCard(provider, data)
   end
   table.insert(header, ui.spacer({ flexGrow = 1 }))
   table.insert(header, ui.label({ text = headerValue, fontSize = 13, fontWeight = "bold", color = provider.color }))
-  if HISTORY_PROVIDERS[provider.id] then
-    table.insert(header, ui.glyph({
-      name = expanded[provider.id] and "chevron-up" or "chevron-down",
-      size = 14,
-      color = "on_surface_variant",
-    }))
-  end
 
   local content = {
     ui.row({ gap = 6, align = "center" }, header),
@@ -297,7 +289,8 @@ local function providerCard(provider, data)
     end
   end
 
-  if HISTORY_PROVIDERS[provider.id] and expanded[provider.id] then
+  local h = HISTORY_PROVIDERS[provider.id] and history[provider.id] or nil
+  if type(h) == "table" and type(h.models) == "table" and #h.models > 0 then
     table.insert(content, ui.separator({}))
     for _, node in ipairs(weeklyBreakdown(provider)) do
       table.insert(content, node)
@@ -313,10 +306,6 @@ local function providerCard(provider, data)
     radius = 0,
     border = "outline",
     borderWidth = 1,
-    onClick = HISTORY_PROVIDERS[provider.id] and function()
-      expanded[provider.id] = not expanded[provider.id]
-      render()
-    end or nil,
   }, content)
 end
 
